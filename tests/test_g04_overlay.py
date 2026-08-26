@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -52,6 +52,14 @@ def _dt(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def _utc_token(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc).isoformat(timespec="seconds").replace(
+        "+00:00", "Z"
+    )
+
+
 SCENARIOS = {
     "A": {
         "case_id": "CHG-A01",
@@ -62,7 +70,6 @@ SCENARIOS = {
         "created_at": "2026-08-25T19:00:00Z",
         "revision_created_at": "2026-08-25T19:02:00Z",
         "proposal_changed_at": "2026-08-25T19:03:00Z",
-        "overlay_created_at": "2026-08-25T19:20:00Z",
         "owner": "Change Owner A",
         "material": "MC-A-01",
         "scope": 'CoolingType = "Liquid"',
@@ -77,7 +84,6 @@ SCENARIOS = {
         "created_at": "2026-08-25T20:10:00Z",
         "revision_created_at": "2026-08-25T20:12:00Z",
         "proposal_changed_at": "2026-08-25T20:13:00Z",
-        "overlay_created_at": "2026-08-25T20:30:00Z",
         "owner": "Change Owner B",
         "material": "MC-B-01",
         "scope": 'CoolingType = "Liquid" AND PackFamily = "LongRange"',
@@ -92,7 +98,6 @@ SCENARIOS = {
         "created_at": "2026-08-25T21:30:00Z",
         "revision_created_at": "2026-08-25T21:32:00Z",
         "proposal_changed_at": "2026-08-25T21:33:00Z",
-        "overlay_created_at": "2026-08-25T21:50:00Z",
         "owner": "Change Owner C",
         "material": "MC-C-01",
         "scope": 'CoolingType = "Liquid"',
@@ -100,6 +105,13 @@ SCENARIOS = {
             "Synthetic supplier process change with elevated authority classification"
         ),
     },
+}
+
+FROZEN_OVERLAY_CREATED_AT = {
+    "OV-A01": "2026-08-25T19:20:00Z",
+    "OV-B01": "2026-08-25T20:30:00Z",
+    "OV-B02": "2026-08-25T21:10:00Z",
+    "OV-C01": "2026-08-25T21:50:00Z",
 }
 
 
@@ -214,10 +226,11 @@ def _proposal(
 
 def _overlay(scenario: str, *, overlay_id: str | None = None) -> OverlayRevisionInput:
     values = SCENARIOS[scenario]
+    selected_overlay_id = overlay_id or values["overlay_id"]
     return OverlayRevisionInput(
-        overlay_revision_id=overlay_id or values["overlay_id"],
+        overlay_revision_id=selected_overlay_id,
         change_case_id=values["case_id"],
-        created_at=_dt(values["overlay_created_at"]),
+        created_at=_dt(FROZEN_OVERLAY_CREATED_AT[selected_overlay_id]),
     )
 
 
@@ -340,6 +353,9 @@ def test_initial_frozen_overlays_pass_and_materialize_exactly(
         overlay = session.get(OverlayRevision, values["overlay_id"])
         assert overlay is not None
         assert overlay.change_case_id == values["case_id"]
+        assert _utc_token(overlay.created_at) == FROZEN_OVERLAY_CREATED_AT[
+            values["overlay_id"]
+        ]
         memberships = list(
             session.scalars(
                 select(OverlayChangeItemMembership).where(
@@ -406,6 +422,7 @@ def test_ov_b02_passes_against_reused_bl_b01_and_materializes_exact_scope(
                 "CI-B02": "OVOBJ-B02-PSO",
             },
         )
+        assert _utc_token(candidate.revision.created_at) == "2026-08-25T21:10:00Z"
         result = evaluate_overlay_execution_eligibility(
             session, reused.assessment_baseline_id, candidate
         )
@@ -416,6 +433,11 @@ def test_ov_b02_passes_against_reused_bl_b01_and_materializes_exact_scope(
         )
 
     with Session(engine) as session:
+        b01 = session.get(OverlayRevision, "OV-B01")
+        b02 = session.get(OverlayRevision, "OV-B02")
+        assert b01 is not None and b02 is not None
+        assert _utc_token(b01.created_at) == FROZEN_OVERLAY_CREATED_AT["OV-B01"]
+        assert _utc_token(b02.created_at) == FROZEN_OVERLAY_CREATED_AT["OV-B02"]
         memberships = list(
             session.execute(
                 select(
@@ -629,7 +651,11 @@ def test_same_case_membership_is_validated_before_commit(engine) -> None:
         create_change_case(session, _case("C"))
         candidate = construct_candidate_overlay(
             session,
-            _overlay("C", overlay_id="OV-X01"),
+            OverlayRevisionInput(
+                overlay_revision_id="OV-X01",
+                change_case_id="CHG-C01",
+                created_at=_dt("2026-08-25T21:50:00Z"),
+            ),
             memberships=[
                 OverlayChangeItemMembershipInput(
                     overlay_revision_id="OV-X01",
