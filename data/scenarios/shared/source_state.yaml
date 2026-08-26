@@ -1,0 +1,161 @@
+product_elements:
+  - product_element_id: PE-002
+    external_identifier: SYN-TMA-001
+    name: Thermal Management Assembly
+    element_type: Assembly
+    source_class: Product Data Source
+    source_identifier: PDS-PE-002
+    extraction_timestamp: '2026-08-25T18:00:00Z'
+  - product_element_id: PE-003
+    external_identifier: SYN-CP-001
+    name: Cooling Plate
+    element_type: Component
+    source_class: Product Data Source
+    source_identifier: PDS-PE-003
+    extraction_timestamp: '2026-08-25T18:00:00Z'
+
+product_versions:
+  - product_version_id: PV-002
+    product_element_id: PE-002
+    revision: A
+    iteration: '1'
+    lifecycle_state: Current
+    is_baselined: true
+    supersedes_product_version_id: null
+    source_class: Product Data Source
+    source_identifier: PDS-PV-002-A1
+    extraction_timestamp: '2026-08-25T18:00:00Z'
+  - product_version_id: PV-003
+    product_element_id: PE-003
+    revision: A
+    iteration: '1'
+    lifecycle_state: Current
+    is_baselined: true
+    supersedes_product_version_id: null
+    source_class: Product Data Source
+    source_identifier: PDS-PV-003-A1
+    extraction_timestamp: '2026-08-25T18:00:00Z'
+
+configuration_contexts:
+  - configuration_context_id: CFG-001
+    name: LongRange Liquid Configuration
+    feature_values:
+      PackFamily: LongRange
+      CoolingType: Liquid
+    completeness_state: Complete
+
+applicability_rules:
+  - rule_id: APP-001
+    expression: 'CoolingType = "Liquid"'
+    rule_version: '1'
+
+effectivity_specifications:
+  - effectivity_specification_id: EFF-001
+    effectivity_type: Planned Engineering Effective Date
+    planned_effective_date: '2026-11-01'
+
+product_structure_occurrences:
+  - occurrence_id: PSO-002
+    parent_product_version_id: PV-002
+    child_product_version_id: PV-003
+    position: '020'
+    quantity: 1
+    unit: EA
+    applicability_rule:
+      rule_id: APP-001
+      expression: 'CoolingType = "Liquid"'
+      rule_version: '1'
+    effectivity_specification:
+      effectivity_type: Planned Engineering Effective Date
+      planned_effective_date: '2026-11-01'
+    source_class: Product Data Source
+    source_identifier: PDS-PSO-002
+    extraction_timestamp: '2026-08-25T18:00:00Z'
+
+requirements:
+  - requirement_id: REQ-001
+    requirement_revision: '1'
+    text: Cooling Plate functional behaviour shall remain acceptable within the declared synthetic configuration scope.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-001
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+  - requirement_id: REQ-002
+    requirement_revision: '1'
+    text: Validation evidence used for a proposed Cooling Plate state shall be demonstrated as applicable to the evaluated state.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-002
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+  - requirement_id: REQ-003
+    requirement_revision: '1'
+    text: The proposed Cooling Plate state shall remain compatible with the declared synthetic manufacturing route.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-003
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+  - requirement_id: REQ-004
+    requirement_revision: '1'
+    text: Cooling Plate occurrence applicability shall not include configurations outside the validated scope of the selected Cooling Plate product state.
+    allocated_product_element_id: PE-002
+    source_class: Requirements Source
+    source_identifier: REQSRC-004
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+
+evidence_records:
+  - evidence_record_id: EV-001
+    evidence_type: Validation Result
+    reference: SYN-VAL-A-001
+    applicable_product_version_id: PV-003
+    configuration_context_id: CFG-001
+    requirement_id: REQ-002
+    result: Current state meets the defined synthetic validation criterion.
+    issue_date: '2026-08-15'
+    validity_state: Current
+    provider: Synthetic Validation Function
+    superseded_by_evidence_id: null
+    source_class: Evidence Source
+    source_identifier: EVSRC-001
+    extraction_timestamp: '2026-08-25T18:10:00Z'
+  - evidence_record_id: EV-002
+    evidence_type: Manufacturing Review
+    reference: SYN-MFG-A-001
+    applicable_product_version_id: PV-003
+    configuration_context_id: CFG-001
+    requirement_id: REQ-003
+    result: Current state is compatible with the defined synthetic manufacturing route.
+    issue_date: '2026-08-16'
+    validity_state: Current
+    provider: Synthetic Manufacturing Function
+    superseded_by_evidence_id: null
+    source_class: Evidence Source
+    source_identifier: EVSRC-002
+    extraction_timestamp: '2026-08-25T18:10:00Z'
+  - evidence_record_id: EV-003
+    evidence_type: Engineering Review
+    reference: SYN-ENG-A-001
+    applicable_product_version_id: PV-003
+    configuration_context_id: CFG-001
+    requirement_id: REQ-001
+    result: Current functional interfaces are acceptable in the defined synthetic configuration.
+    issue_date: '2026-08-17'
+    validity_state: Current
+    provider: Synthetic Product Engineering Function
+    superseded_by_evidence_id: null
+    source_class: Evidence Source
+    source_identifier: EVSRC-003
+    extraction_timestamp: '2026-08-25T18:10:00Z'
+  - evidence_record_id: EV-004
+    evidence_type: Supplier/Cost Review
+    reference: SYN-COST-A-001
+    applicable_product_version_id: PV-003
+    configuration_context_id: CFG-001
+    requirement_id: null
+    result: Supplier-origin change has a documented non-blocking synthetic cost impact.
+    issue_date: '2026-08-18'
+    validity_state: Current
+    provider: Synthetic Purchasing/Cost Function
+    superseded_by_evidence_id: null
+    source_class: Evidence Source
+    source_identifier: EVSRC-004
+    extraction_timestamp: '2026-08-25T18:10:00Z'

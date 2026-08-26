@@ -7,6 +7,7 @@ from sqlalchemy import engine_from_config, pool
 
 from plm_ref.infrastructure.db.base import Base
 from plm_ref.infrastructure.db.session import install_sqlite_foreign_key_hook
+from plm_ref.infrastructure.db import models as _models  # noqa: F401
 
 config = context.config
 
