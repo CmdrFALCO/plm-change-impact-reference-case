@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import ast
-import importlib.util
 import inspect
 from datetime import datetime
 from pathlib import Path
 
 import pytest
+from alembic import command
+from alembic.config import Config
 from pydantic import ValidationError
+from sqlalchemy import inspect as sa_inspect
 from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -36,8 +38,19 @@ from plm_ref.infrastructure.db.models import (
 )
 from plm_ref.infrastructure.db.session import create_sqlite_engine
 
-ROOT = Path(__file__).resolve().parents[1]
-MIG_002_PATH = ROOT / "migrations" / "versions" / "mig_002_change_case_change_item_gate_a.py"
+G02_TABLES = {
+    "product_elements",
+    "product_versions",
+    "product_structure_occurrences",
+    "configuration_contexts",
+    "requirements",
+    "evidence_records",
+    "change_cases",
+    "change_items",
+    "change_item_revisions",
+    "change_item_proposal_states",
+    "open_items",
+}
 
 
 def _dt(value: str) -> datetime:
@@ -264,13 +277,25 @@ def _load_revise(session: Session, case_id: str, item_id: str, **kwargs) -> None
     )
 
 
-def test_mig_002_revision_metadata_remains_frozen() -> None:
-    spec = importlib.util.spec_from_file_location("mig_002", MIG_002_PATH)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    assert module.revision == "mig_002"
-    assert module.down_revision == "mig_001"
+def test_mig_002_applies_from_empty_database_and_remains_revision_two(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "migration.db"
+    config = Config("alembic.ini")
+    config.set_main_option("sqlalchemy.url", f"sqlite+pysqlite:///{database_path}")
+    command.upgrade(config, "mig_002")
+
+    engine = create_sqlite_engine(database_path)
+    try:
+        assert set(sa_inspect(engine).get_table_names()) == G02_TABLES | {
+            "alembic_version"
+        }
+        with engine.connect() as connection:
+            assert connection.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one() == "mig_002"
+    finally:
+        engine.dispose()
 
 
 def test_all_frozen_gate_a_paths_pass_without_baseline_rows(session: Session) -> None:
@@ -382,13 +407,17 @@ def test_revision_numbers_must_strictly_increase(session: Session) -> None:
     create_change_case(session, _case("CHG-X06"))
     create_change_item(
         session,
-        _revise("CI-X06", "CHG-X06", revision="r2"),
-        _proposal("CI-X06", "CHG-X06", revision="r2"),
+        _revise("CI-X06", "CHG-X06", revision="r1"),
+        _proposal("CI-X06", "CHG-X06", revision="r1"),
+    )
+    create_change_item_revision(
+        session,
+        _revise("CI-X06", "CHG-X06", revision="r3"),
     )
     with pytest.raises(ValueError, match="strictly increasing"):
         create_change_item_revision(
             session,
-            _revise("CI-X06", "CHG-X06", revision="r1"),
+            _revise("CI-X06", "CHG-X06", revision="r2"),
         )
 
 
