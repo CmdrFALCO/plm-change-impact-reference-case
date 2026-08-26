@@ -1,0 +1,70 @@
+assessment_baseline_id: BL-C01
+change_case_id: CHG-C01
+snapshot_timestamp: '2026-08-25T21:40:00Z'
+configuration_context_id: CFG-001
+effectivity_context:
+  effectivity_type: Planned Engineering Effective Date
+  planned_effective_date: '2026-11-01'
+rule_set_version: RRR-v0.1
+created_at: '2026-08-25T21:40:00Z'
+members:
+  - baseline_member_id: BM-C01-01
+    object_type: Product Version
+    object_id: PV-002
+    object_revision_or_state_token: 'A.1'
+    source_identifier: PDS-PV-002-A1
+    snapshot_alias: SNAP-PV-002
+  - baseline_member_id: BM-C01-02
+    object_type: Product Version
+    object_id: PV-003
+    object_revision_or_state_token: 'A.1'
+    source_identifier: PDS-PV-003-A1
+    snapshot_alias: SNAP-PV-003
+  - baseline_member_id: BM-C01-03
+    object_type: Product Structure Occurrence
+    object_id: PSO-002
+    object_revision_or_state_token: 'PSO-002@2026-08-25T18:00:00Z'
+    source_identifier: PDS-PSO-002
+    snapshot_alias: SNAP-PSO-002
+  - baseline_member_id: BM-C01-04
+    object_type: Configuration Context
+    object_id: CFG-001
+    object_revision_or_state_token: 'Complete@2026-08-25'
+    source_identifier: CFG-001
+    snapshot_alias: SNAP-CFG-001
+  - baseline_member_id: BM-C01-05
+    object_type: Applicability Rule
+    object_id: APP-001
+    object_revision_or_state_token: 'v1'
+    source_identifier: APP-001
+    snapshot_alias: SNAP-APP-001
+  - baseline_member_id: BM-C01-06
+    object_type: Effectivity Specification
+    object_id: EFF-001
+    object_revision_or_state_token: '2026-11-01'
+    source_identifier: EFF-001
+    snapshot_alias: SNAP-EFF-001
+  - baseline_member_id: BM-C01-07
+    object_type: Requirement
+    object_id: REQ-001
+    object_revision_or_state_token: 'r1'
+    source_identifier: REQSRC-001
+    snapshot_alias: SNAP-REQ-001
+  - baseline_member_id: BM-C01-08
+    object_type: Requirement
+    object_id: REQ-002
+    object_revision_or_state_token: 'r1'
+    source_identifier: REQSRC-002
+    snapshot_alias: SNAP-REQ-002
+  - baseline_member_id: BM-C01-09
+    object_type: Requirement
+    object_id: REQ-003
+    object_revision_or_state_token: 'r1'
+    source_identifier: REQSRC-003
+    snapshot_alias: SNAP-REQ-003
+  - baseline_member_id: BM-C01-10
+    object_type: Requirement
+    object_id: REQ-004
+    object_revision_or_state_token: 'r1'
+    source_identifier: REQSRC-004
+    snapshot_alias: SNAP-REQ-004

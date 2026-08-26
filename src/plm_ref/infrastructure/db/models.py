@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     ForeignKeyConstraint,
+    Index,
     JSON,
     String,
     Text,
@@ -277,3 +278,40 @@ class OpenItem(Base):
     resolution_evidence_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class AssessmentBaseline(Base):
+    __tablename__ = "assessment_baselines"
+    __table_args__ = (
+        Index("ix_assessment_baselines_change_case_id", "change_case_id"),
+    )
+
+    assessment_baseline_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+    snapshot_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    configuration_context_id: Mapped[str] = mapped_column(
+        ForeignKey("configuration_contexts.configuration_context_id"), nullable=False
+    )
+    effectivity_context: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    rule_set_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class BaselineMember(Base):
+    __tablename__ = "baseline_members"
+    __table_args__ = (
+        Index("ix_baseline_members_baseline_id", "assessment_baseline_id"),
+        Index("ix_baseline_members_object_lookup", "object_type", "object_id"),
+    )
+
+    baseline_member_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    assessment_baseline_id: Mapped[str] = mapped_column(
+        ForeignKey("assessment_baselines.assessment_baseline_id"), nullable=False
+    )
+    object_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    object_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    object_revision_or_state_token: Mapped[str] = mapped_column(String(128), nullable=False)
+    source_identifier: Mapped[str] = mapped_column(String(128), nullable=False)
+    snapshot_payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

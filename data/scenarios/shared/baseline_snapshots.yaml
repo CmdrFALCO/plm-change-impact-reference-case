@@ -1,0 +1,105 @@
+SNAP-PV-002:
+  object_type: Product Version
+  object_id: PV-002
+  snapshot_payload:
+    product_version_id: PV-002
+    product_element_id: PE-002
+    revision: A
+    iteration: '1'
+    lifecycle_state: Current
+SNAP-PV-003:
+  object_type: Product Version
+  object_id: PV-003
+  snapshot_payload:
+    product_version_id: PV-003
+    product_element_id: PE-003
+    revision: A
+    iteration: '1'
+    lifecycle_state: Current
+    material_characteristic: MC-BASE-01
+    validated_configuration_scope: 'CoolingType = "Liquid"'
+SNAP-PSO-002:
+  object_type: Product Structure Occurrence
+  object_id: PSO-002
+  snapshot_payload:
+    occurrence_id: PSO-002
+    parent_product_version_id: PV-002
+    child_product_version_id: PV-003
+    position: '020'
+    quantity: 1
+    unit: EA
+    applicability_rule:
+      rule_id: APP-001
+      expression: 'CoolingType = "Liquid"'
+      rule_version: '1'
+    effectivity_specification:
+      effectivity_type: Planned Engineering Effective Date
+      planned_effective_date: '2026-11-01'
+SNAP-CFG-001:
+  object_type: Configuration Context
+  object_id: CFG-001
+  snapshot_payload:
+    configuration_context_id: CFG-001
+    name: LongRange Liquid Configuration
+    feature_values:
+      PackFamily: LongRange
+      CoolingType: Liquid
+    completeness_state: Complete
+SNAP-APP-001:
+  object_type: Applicability Rule
+  object_id: APP-001
+  snapshot_payload:
+    rule_id: APP-001
+    expression: 'CoolingType = "Liquid"'
+    rule_version: '1'
+    evaluation_in_CFG-001: Included
+SNAP-EFF-001:
+  object_type: Effectivity Specification
+  object_id: EFF-001
+  snapshot_payload:
+    effectivity_type: Planned Engineering Effective Date
+    planned_effective_date: '2026-11-01'
+SNAP-REQ-001:
+  object_type: Requirement
+  object_id: REQ-001
+  snapshot_payload:
+    requirement_id: REQ-001
+    requirement_revision: '1'
+    text: Cooling Plate functional behaviour shall remain acceptable within the declared synthetic configuration scope.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-001
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+SNAP-REQ-002:
+  object_type: Requirement
+  object_id: REQ-002
+  snapshot_payload:
+    requirement_id: REQ-002
+    requirement_revision: '1'
+    text: Validation evidence used for a proposed Cooling Plate state shall be demonstrated as applicable to the evaluated state.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-002
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+SNAP-REQ-003:
+  object_type: Requirement
+  object_id: REQ-003
+  snapshot_payload:
+    requirement_id: REQ-003
+    requirement_revision: '1'
+    text: The proposed Cooling Plate state shall remain compatible with the declared synthetic manufacturing route.
+    allocated_product_element_id: PE-003
+    source_class: Requirements Source
+    source_identifier: REQSRC-003
+    extraction_timestamp: '2026-08-25T18:05:00Z'
+SNAP-REQ-004:
+  object_type: Requirement
+  object_id: REQ-004
+  snapshot_payload:
+    requirement_id: REQ-004
+    requirement_revision: '1'
+    text: Cooling Plate occurrence applicability shall not include configurations outside the validated scope of the selected Cooling Plate product state.
+    allocated_product_element_id: PE-002
+    source_class: Requirements Source
+    source_identifier: REQSRC-004
+    extraction_timestamp: '2026-08-25T18:05:00Z'
