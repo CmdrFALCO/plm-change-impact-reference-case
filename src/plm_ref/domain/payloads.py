@@ -58,6 +58,23 @@ class ChangeApplicabilityProposalPayload(_StrictPayload):
     applicability_rule: ApplicabilityRulePayload
 
 
+class OverlayProductVersionStatePayload(ReviseProductStateProposalPayload):
+    """Materialised proposed Product Version state scoped to one overlay."""
+
+
+class OverlayOccurrenceStatePayload(_StrictPayload):
+    """Materialised proposed occurrence/applicability state scoped to one overlay."""
+
+    occurrence_id: str
+    parent_product_version_id: str
+    child_product_version_reference: str
+    position: str
+    quantity: int
+    unit: str
+    applicability_rule: ApplicabilityRulePayload
+    effectivity_specification: EffectivityPayload
+
+
 class BaselineProductVersionSnapshot(_StrictPayload):
     product_version_id: str
     product_element_id: str

@@ -315,3 +315,81 @@ class BaselineMember(Base):
     object_revision_or_state_token: Mapped[str] = mapped_column(String(128), nullable=False)
     source_identifier: Mapped[str] = mapped_column(String(128), nullable=False)
     snapshot_payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+
+class OverlayRevision(Base):
+    __tablename__ = "overlay_revisions"
+    __table_args__ = (
+        Index("ix_overlay_revisions_change_case_id", "change_case_id"),
+    )
+
+    overlay_revision_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class OverlayChangeItemMembership(Base):
+    __tablename__ = "overlay_change_item_memberships"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["change_item_id", "change_item_revision"],
+            [
+                "change_item_revisions.change_item_id",
+                "change_item_revisions.change_item_revision",
+            ],
+        ),
+        UniqueConstraint(
+            "overlay_revision_id",
+            "change_item_id",
+            "change_item_revision",
+            name="uq_overlay_membership_revision",
+        ),
+        Index(
+            "ix_overlay_memberships_change_item_revision",
+            "change_item_id",
+            "change_item_revision",
+        ),
+    )
+
+    overlay_revision_id: Mapped[str] = mapped_column(
+        ForeignKey("overlay_revisions.overlay_revision_id"), primary_key=True
+    )
+    change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_item_revision: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class OverlayLocalObject(Base):
+    __tablename__ = "overlay_local_objects"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [
+                "overlay_revision_id",
+                "source_change_item_id",
+                "source_change_item_revision",
+            ],
+            [
+                "overlay_change_item_memberships.overlay_revision_id",
+                "overlay_change_item_memberships.change_item_id",
+                "overlay_change_item_memberships.change_item_revision",
+            ],
+            name="fk_overlay_local_objects_source_membership",
+        ),
+        CheckConstraint(
+            "object_type IN ('Product Version', 'Product Structure Occurrence')",
+            name="ck_overlay_local_objects_object_type",
+        ),
+        Index(
+            "ix_overlay_local_objects_source_change_item",
+            "source_change_item_id",
+            "source_change_item_revision",
+        ),
+    )
+
+    overlay_revision_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    overlay_local_object_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    object_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_change_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_change_item_revision: Mapped[str] = mapped_column(String(32), nullable=False)
+    state_payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
