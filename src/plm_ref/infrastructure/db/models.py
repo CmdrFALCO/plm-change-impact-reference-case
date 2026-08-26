@@ -3,7 +3,18 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, JSON, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    JSON,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from plm_ref.infrastructure.db.base import Base
@@ -128,3 +139,141 @@ class EvidenceRecord(Base):
     source_class: Mapped[str] = mapped_column(String(64), nullable=False)
     source_identifier: Mapped[str] = mapped_column(String(128), nullable=False)
     extraction_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class ChangeCase(Base):
+    __tablename__ = "change_cases"
+    __table_args__ = (
+        CheckConstraint(
+            "case_state IN ('Draft', 'Open', 'In Assessment', 'Decision Ready', "
+            "'Withdrawn', 'Closed by Decision')",
+            name="ck_change_cases_case_state",
+        ),
+    )
+
+    change_case_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    trigger: Mapped[str] = mapped_column(String(255), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)
+    change_owner: Mapped[str] = mapped_column(String(255), nullable=False)
+    case_state: Mapped[str] = mapped_column(String(32), nullable=False)
+    process_iteration: Mapped[int] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class ChangeItem(Base):
+    __tablename__ = "change_items"
+    __table_args__ = (
+        UniqueConstraint(
+            "change_item_id",
+            "change_case_id",
+            name="uq_change_items_identity_case",
+        ),
+    )
+
+    change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+
+
+class ChangeItemRevision(Base):
+    __tablename__ = "change_item_revisions"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["change_item_id", "change_case_id"],
+            ["change_items.change_item_id", "change_items.change_case_id"],
+            name="fk_change_item_revisions_identity_case",
+        ),
+        UniqueConstraint(
+            "change_item_id",
+            "change_item_revision",
+            "change_case_id",
+            name="uq_change_item_revisions_identity_revision_case",
+        ),
+        CheckConstraint(
+            "action IN ('Revise Product State', 'Change Applicability')",
+            name="ck_change_item_revisions_action",
+        ),
+    )
+
+    change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_item_revision: Mapped[str] = mapped_column(String(32), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
+    target_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    target_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    current_state_reference: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    proposed_state_payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    owner: Mapped[str] = mapped_column(String(255), nullable=False)
+    configuration_context_id: Mapped[str] = mapped_column(
+        ForeignKey("configuration_contexts.configuration_context_id"), nullable=False
+    )
+    intended_effectivity: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    revision_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class ChangeItemProposalState(Base):
+    __tablename__ = "change_item_proposal_states"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["change_item_id", "selected_revision", "change_case_id"],
+            [
+                "change_item_revisions.change_item_id",
+                "change_item_revisions.change_item_revision",
+                "change_item_revisions.change_case_id",
+            ],
+            name="fk_proposal_state_selected_revision_case",
+        ),
+        CheckConstraint(
+            "proposal_state IN ('Active', 'Removed from Proposal')",
+            name="ck_change_item_proposal_states_state",
+        ),
+    )
+
+    change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    selected_revision: Mapped[str] = mapped_column(String(32), nullable=False)
+    proposal_state: Mapped[str] = mapped_column(String(32), nullable=False)
+    state_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    state_changed_by: Mapped[str] = mapped_column(String(255), nullable=False)
+
+
+class OpenItem(Base):
+    __tablename__ = "open_items"
+    __table_args__ = (
+        CheckConstraint(
+            "item_type IN ('Information Gap', 'Data Defect', 'Conflict', 'Required Action')",
+            name="ck_open_items_item_type",
+        ),
+        CheckConstraint(
+            "status IN ('Open', 'In Resolution', 'Resolved', 'Cancelled')",
+            name="ck_open_items_status",
+        ),
+        CheckConstraint(
+            "blocking_class IN ('Blocking', 'Non-blocking')",
+            name="ck_open_items_blocking_class",
+        ),
+        CheckConstraint(
+            "required_before_stage IN ('Initial Distribution', 'Assessment Completion', 'Decision')",
+            name="ck_open_items_required_before_stage",
+        ),
+    )
+
+    open_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+    source_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    item_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    owner: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    blocking_class: Mapped[str] = mapped_column(String(32), nullable=False)
+    required_before_stage: Mapped[str] = mapped_column(String(64), nullable=False)
+    resolution_evidence_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

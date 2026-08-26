@@ -39,7 +39,7 @@ EXPECTED_SOURCE_TABLES = {
 def _upgrade_mig_001(database_path: Path) -> None:
     config = Config("alembic.ini")
     config.set_main_option("sqlalchemy.url", f"sqlite+pysqlite:///{database_path}")
-    command.upgrade(config, "head")
+    command.upgrade(config, "mig_001")
 
 
 def _migrated_engine(tmp_path: Path):
