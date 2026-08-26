@@ -1,0 +1,29 @@
+candidates:
+  - impact_candidate_id: IC-B21
+    candidate_type: Product Structure Occurrence
+    candidate_reference: OVOBJ-B02-PSO
+    affected_domain: Product Engineering
+    provenance:
+      - impact_candidate_provenance_id: ICP-B21
+        change_item_id: CI-B02
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: OVOBJ-B02-PV
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: OVOBJ-B02-PSO
+            state_context: Proposed State
+  - impact_candidate_id: IC-B22
+    candidate_type: Product Structure Occurrence
+    candidate_reference: OVOBJ-B02-PSO
+    affected_domain: Manufacturing
+    provenance:
+      - impact_candidate_provenance_id: ICP-B22
+        change_item_id: CI-B02
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: OVOBJ-B02-PV
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: OVOBJ-B02-PSO
+            state_context: Proposed State

@@ -15,3 +15,11 @@ class OverlayExecutionEligibilityError(DomainIntegrityError):
     def __init__(self, reasons: tuple[str, ...]):
         self.reasons = reasons
         super().__init__("Overlay Execution Eligibility failed: " + "; ".join(reasons))
+
+
+class ImpactExecutionLineageError(DomainIntegrityError):
+    """Raised before execution when case-local frozen lineage is invalid."""
+
+
+class ImpactResultValidationError(DomainIntegrityError):
+    """Raised when adapter output violates structured impact invariants."""

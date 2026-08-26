@@ -1,0 +1,67 @@
+candidates:
+  - impact_candidate_id: IC-A01
+    candidate_type: Product Structure Occurrence
+    candidate_reference: PSO-002
+    affected_domain: Product Engineering
+    provenance:
+      - impact_candidate_provenance_id: ICP-A01
+        change_item_id: CI-A01
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: BM-A01-02
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: BM-A01-03
+            state_context: Current State
+          - sequence: 2
+            source_reference: BM-A01-03
+            relationship_type: OCCURS_IN_PARENT
+            target_reference: BM-A01-01
+            state_context: Current State
+  - impact_candidate_id: IC-A02
+    candidate_type: Product Version
+    candidate_reference: PV-003
+    affected_domain: Validation
+    provenance:
+      - impact_candidate_provenance_id: ICP-A02
+        change_item_id: CI-A01
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: BM-A01-02
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: BM-A01-03
+            state_context: Current State
+  - impact_candidate_id: IC-A03
+    candidate_type: Product Structure Occurrence
+    candidate_reference: PSO-002
+    affected_domain: Manufacturing
+    provenance:
+      - impact_candidate_provenance_id: ICP-A03
+        change_item_id: CI-A01
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: BM-A01-02
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: BM-A01-03
+            state_context: Current State
+          - sequence: 2
+            source_reference: BM-A01-03
+            relationship_type: OCCURS_IN_PARENT
+            target_reference: BM-A01-01
+            state_context: Current State
+  - impact_candidate_id: IC-A04
+    candidate_type: Product Version
+    candidate_reference: PV-003
+    affected_domain: Purchasing/Cost
+    provenance:
+      - impact_candidate_provenance_id: ICP-A04
+        change_item_id: CI-A01
+        change_item_revision: r1
+        dependency_path:
+          - sequence: 1
+            source_reference: BM-A01-02
+            relationship_type: REFERENCED_BY_OCCURRENCE
+            target_reference: BM-A01-03
+            state_context: Current State

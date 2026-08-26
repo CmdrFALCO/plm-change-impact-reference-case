@@ -5,9 +5,12 @@ from sqlalchemy.orm import Session
 
 from plm_ref.domain.errors import ImmutableRecordError
 from plm_ref.infrastructure.db.models import (
+    AssessmentBaseline,
     BaselineMember,
     ChangeItemRevision,
+    ImpactExecution,
     OverlayChangeItemMembership,
+    OverlayRevision,
     ProductVersion,
 )
 
@@ -72,3 +75,91 @@ def assert_change_item_revision_mutable(
             "because it is referenced by an Overlay Revision"
         )
     return revision
+
+
+def is_assessment_baseline_referenced_by_execution(
+    session: Session, assessment_baseline_id: str
+) -> bool:
+    statement = select(ImpactExecution.impact_execution_id).where(
+        ImpactExecution.assessment_baseline_id == assessment_baseline_id
+    )
+    return session.execute(statement.limit(1)).scalar_one_or_none() is not None
+
+
+def assert_assessment_baseline_mutable(
+    session: Session, assessment_baseline_id: str
+) -> AssessmentBaseline:
+    baseline = session.get(AssessmentBaseline, assessment_baseline_id)
+    if baseline is None:
+        raise ValueError(
+            f"Assessment Baseline {assessment_baseline_id} does not exist"
+        )
+    if is_assessment_baseline_referenced_by_execution(
+        session, assessment_baseline_id
+    ):
+        raise ImmutableRecordError(
+            f"Assessment Baseline {assessment_baseline_id} is immutable because "
+            "it is referenced by an Impact-analysis Execution"
+        )
+    return baseline
+
+
+def assert_baseline_member_set_mutable(
+    session: Session, assessment_baseline_id: str
+) -> AssessmentBaseline:
+    return assert_assessment_baseline_mutable(session, assessment_baseline_id)
+
+
+def assert_baseline_members_mutable(
+    session: Session, assessment_baseline_id: str
+) -> AssessmentBaseline:
+    return assert_baseline_member_set_mutable(session, assessment_baseline_id)
+
+
+def is_overlay_revision_referenced_by_execution(
+    session: Session, overlay_revision_id: str
+) -> bool:
+    statement = select(ImpactExecution.impact_execution_id).where(
+        ImpactExecution.overlay_revision_id == overlay_revision_id
+    )
+    return session.execute(statement.limit(1)).scalar_one_or_none() is not None
+
+
+def assert_overlay_revision_mutable(
+    session: Session, overlay_revision_id: str
+) -> OverlayRevision:
+    overlay = session.get(OverlayRevision, overlay_revision_id)
+    if overlay is None:
+        raise ValueError(f"Overlay Revision {overlay_revision_id} does not exist")
+    if is_overlay_revision_referenced_by_execution(session, overlay_revision_id):
+        raise ImmutableRecordError(
+            f"Overlay Revision {overlay_revision_id} is immutable because it is "
+            "referenced by an Impact-analysis Execution"
+        )
+    return overlay
+
+
+def assert_overlay_change_item_membership_set_mutable(
+    session: Session, overlay_revision_id: str
+) -> OverlayRevision:
+    return assert_overlay_revision_mutable(session, overlay_revision_id)
+
+
+def assert_overlay_memberships_mutable(
+    session: Session, overlay_revision_id: str
+) -> OverlayRevision:
+    return assert_overlay_change_item_membership_set_mutable(
+        session, overlay_revision_id
+    )
+
+
+def assert_overlay_local_object_set_mutable(
+    session: Session, overlay_revision_id: str
+) -> OverlayRevision:
+    return assert_overlay_revision_mutable(session, overlay_revision_id)
+
+
+def assert_overlay_local_objects_mutable(
+    session: Session, overlay_revision_id: str
+) -> OverlayRevision:
+    return assert_overlay_local_object_set_mutable(session, overlay_revision_id)

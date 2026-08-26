@@ -393,3 +393,113 @@ class OverlayLocalObject(Base):
     source_change_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
     source_change_item_revision: Mapped[str] = mapped_column(String(32), nullable=False)
     state_payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+
+class ImpactExecution(Base):
+    __tablename__ = "impact_executions"
+    __table_args__ = (
+        CheckConstraint(
+            "execution_status IN ('Planned', 'Running', 'Completed', 'Failed')",
+            name="ck_impact_executions_execution_status",
+        ),
+        CheckConstraint(
+            "routing_status IN ('Not Started', 'Completed', 'Failed')",
+            name="ck_impact_executions_routing_status",
+        ),
+        Index(
+            "ix_impact_executions_case_lineage",
+            "change_case_id",
+            "assessment_baseline_id",
+            "overlay_revision_id",
+        ),
+    )
+
+    impact_execution_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+    assessment_baseline_id: Mapped[str] = mapped_column(
+        ForeignKey("assessment_baselines.assessment_baseline_id"), nullable=False
+    )
+    overlay_revision_id: Mapped[str] = mapped_column(
+        ForeignKey("overlay_revisions.overlay_revision_id"), nullable=False
+    )
+    rule_set_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    execution_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    execution_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    routing_status: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class ImpactCandidate(Base):
+    __tablename__ = "impact_candidates"
+    __table_args__ = (
+        CheckConstraint(
+            "candidate_state IN ('New', 'Assessment Planned', 'Under Assessment', "
+            "'Assessed', 'Closed as Not Relevant')",
+            name="ck_impact_candidates_candidate_state",
+        ),
+        Index("ix_impact_candidates_execution_id", "impact_execution_id"),
+    )
+
+    impact_candidate_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    impact_execution_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_executions.impact_execution_id"), nullable=False
+    )
+    candidate_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    candidate_reference: Mapped[str] = mapped_column(String(64), nullable=False)
+    affected_domain: Mapped[str] = mapped_column(String(64), nullable=False)
+    candidate_state: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class ImpactCandidateProvenance(Base):
+    __tablename__ = "impact_candidate_provenance"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["change_item_id", "change_item_revision"],
+            [
+                "change_item_revisions.change_item_id",
+                "change_item_revisions.change_item_revision",
+            ],
+        ),
+        Index(
+            "ix_impact_candidate_provenance_candidate_id",
+            "impact_candidate_id",
+        ),
+    )
+
+    impact_candidate_provenance_id: Mapped[str] = mapped_column(
+        String(64), primary_key=True
+    )
+    impact_candidate_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_candidates.impact_candidate_id"), nullable=False
+    )
+    change_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    change_item_revision: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class ImpactCandidatePathStep(Base):
+    __tablename__ = "impact_candidate_path_steps"
+    __table_args__ = (
+        CheckConstraint(
+            "sequence >= 1",
+            name="ck_impact_candidate_path_steps_positive_sequence",
+        ),
+        CheckConstraint(
+            "state_context IN ('Current State', 'Proposed State')",
+            name="ck_impact_candidate_path_steps_state_context",
+        ),
+    )
+
+    impact_candidate_provenance_id: Mapped[str] = mapped_column(
+        ForeignKey(
+            "impact_candidate_provenance.impact_candidate_provenance_id"
+        ),
+        primary_key=True,
+    )
+    sequence: Mapped[int] = mapped_column(primary_key=True)
+    source_reference: Mapped[str] = mapped_column(String(64), nullable=False)
+    relationship_type: Mapped[str] = mapped_column(String(128), nullable=False)
+    target_reference: Mapped[str] = mapped_column(String(64), nullable=False)
+    state_context: Mapped[str] = mapped_column(String(32), nullable=False)
