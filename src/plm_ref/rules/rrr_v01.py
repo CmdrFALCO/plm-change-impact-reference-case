@@ -77,6 +77,23 @@ class ScopeRevisionRequiredSpec:
     affected_change_item_revision: str | None
 
 
+@dataclass(frozen=True)
+class AuthorityResult:
+    """Persistence-free RRR-06 result for one frozen Change Case trigger."""
+
+    required_authority_level: Literal["Standard", "Elevated"] | None
+
+
+def evaluate_rrr06(change_case_trigger: str) -> AuthorityResult:
+    """Derive authority only from the two exact frozen trigger values."""
+
+    mapping: Mapping[str, Literal["Standard", "Elevated"]] = {
+        "Synthetic supplier process change": "Standard",
+        "Synthetic supplier process change with elevated authority classification": "Elevated",
+    }
+    return AuthorityResult(required_authority_level=mapping.get(change_case_trigger))
+
+
 def evaluate_rrr05(
     inputs: Rrr05Input,
     provenance_sources: frozenset[tuple[str, str]],
