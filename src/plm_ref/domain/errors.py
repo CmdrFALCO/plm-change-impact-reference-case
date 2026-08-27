@@ -35,3 +35,7 @@ class RoutingInputError(DomainIntegrityError):
 
 class AssessmentCompletionError(DomainIntegrityError):
     """Raised when an Assessment cannot be completed as one frozen semantic unit."""
+
+
+class AssessmentReuseError(DomainIntegrityError):
+    """Raised when reuse classification or retained fulfilment is invalid."""
