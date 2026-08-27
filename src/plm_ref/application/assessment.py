@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
@@ -50,6 +50,9 @@ class AssessmentCompletionInput:
 
 
 def _snapshot(evidence: EvidenceRecord) -> dict[str, object]:
+    extraction_timestamp = evidence.extraction_timestamp
+    if extraction_timestamp.tzinfo is None:
+        extraction_timestamp = extraction_timestamp.replace(tzinfo=timezone.utc)
     return {
         "evidence_record_id": evidence.evidence_record_id, "evidence_type": evidence.evidence_type,
         "reference": evidence.reference, "applicable_product_version_id": evidence.applicable_product_version_id,
@@ -58,7 +61,7 @@ def _snapshot(evidence: EvidenceRecord) -> dict[str, object]:
         "validity_state": evidence.validity_state, "provider": evidence.provider,
         "superseded_by_evidence_id": evidence.superseded_by_evidence_id, "source_class": evidence.source_class,
         "source_identifier": evidence.source_identifier,
-        "extraction_timestamp": evidence.extraction_timestamp.isoformat().replace("+00:00", "Z"),
+        "extraction_timestamp": extraction_timestamp.isoformat().replace("+00:00", "Z"),
     }
 
 
