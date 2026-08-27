@@ -1,8 +1,69 @@
 {
-  "Cross-scenario assertions": true,
-  "Historical reconstruction": true,
-  "Integrity suite": true,
-  "Scenario A oracle": true,
-  "Scenario B oracle": true,
-  "Scenario C oracle": true
+  "cross_scenario": {
+    "A Decision Scope exact": {
+      "passed": true
+    },
+    "A case-local lineage": {
+      "passed": true
+    },
+    "A only terminal Decision": {
+      "passed": true
+    },
+    "A zero Decision Conditions": {
+      "passed": true
+    },
+    "B and C no Handover": {
+      "passed": true
+    },
+    "B baseline reuse": {
+      "passed": true
+    },
+    "B case-local lineage": {
+      "passed": true
+    },
+    "B only two proposal cycles": {
+      "passed": true
+    },
+    "C authority insufficiency non-terminal": {
+      "passed": true
+    },
+    "C case-local lineage": {
+      "passed": true
+    },
+    "historical overlays distinct": {
+      "passed": true
+    },
+    "retained Assessment semantics": {
+      "passed": true
+    }
+  },
+  "groups": {
+    "Cross-scenario assertions": true,
+    "Historical reconstruction": true,
+    "Integrity suite": true,
+    "Scenario A oracle": true,
+    "Scenario B oracle": true,
+    "Scenario C oracle": true
+  },
+  "historical_diffs": [],
+  "integrity": {
+    "IT-16 Assessment fulfilment": {
+      "passed": true
+    },
+    "IT-16 Assessment reuse": {
+      "passed": true
+    },
+    "IT-16 Decision Scope": {
+      "passed": true
+    },
+    "IT-16 Decision support": {
+      "passed": true
+    },
+    "IT-16 candidate provenance": {
+      "passed": true
+    },
+    "IT-16 execution baseline/overlay": {
+      "passed": true
+    }
+  }
 }

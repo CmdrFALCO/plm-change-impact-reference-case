@@ -15,7 +15,6 @@ from sqlalchemy.orm import Session
 from plm_ref.application.authority import evaluate_authority
 from plm_ref.application.history_and_views import derive_case_handover_view, reconstruct_decision_basis
 from plm_ref.application.readiness import evaluate_authorisation_eligibility, evaluate_gate_b
-from plm_ref.infrastructure.db.base import Base
 from plm_ref.infrastructure.db.models import (
     Assessment, AssessmentEvidenceUse, AssessmentImpactLink, AssessmentObligation,
     AssessmentRequirementConclusion, AssessmentReuseClassification, AssessmentBaseline,
@@ -105,16 +104,52 @@ def _diff(expected: Any, actual: Any, path: str = "$") -> list[dict[str, Any]]:
     return [] if expected == actual else [{"path": path, "expected": expected, "actual": actual}]
 
 
-def _project(actual: Any, expected: Any) -> Any:
-    """Project actual to the frozen oracle shape; lists retain every actual row."""
-    if isinstance(expected, dict) and isinstance(actual, dict):
-        return {key: _project(actual[key], value) for key, value in expected.items() if key in actual}
-    if isinstance(expected, list) and isinstance(actual, list):
-        return [_project(item, expected[0]) for item in actual] if expected else actual
-    return actual
-
-
 def compare_scenario(session: Session, scenario: str, expected: dict[str, Any] | None = None) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     actual = canonical_actual(session, scenario)
     oracle = load_expected(scenario) if expected is None else expected
-    return actual, _diff(oracle, _project(actual, oracle))
+    return actual, _diff(oracle, actual)
+
+
+def verify_historical_basis(actual: dict[str, Any], expected: dict[str, Any]) -> list[dict[str, Any]]:
+    """Compare the independently frozen complete DEC-A01 historical basis."""
+    return _diff(expected["derived"]["historical_basis"], actual["derived"].get("historical_basis"), "$.historical_basis")
+
+
+def cross_scenario_results(actuals: Mapping[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Evaluate the frozen §9 cross-scenario assertions from canonical state."""
+    a, b, c = actuals["A"], actuals["B"], actuals["C"]
+    def rows(state: dict[str, Any], table: str) -> list[dict[str, Any]]: return state["tables"][table]
+    results = {
+        "A only terminal Decision": len(rows(a, "decision_records")) == 1 and not rows(b, "decision_records") and not rows(c, "decision_records"),
+        "B only two proposal cycles": len(rows(b, "impact_executions")) == 2 and len(rows(a, "impact_executions")) == len(rows(c, "impact_executions")) == 1,
+        "B baseline reuse": len(rows(b, "assessment_baselines")) == 1 and {row["assessment_baseline_id"] for row in rows(b, "impact_executions")} == {"BL-B01"},
+        "historical overlays distinct": {row["overlay_revision_id"] for row in rows(b, "overlay_revisions")} == {"OV-B01", "OV-B02"},
+        "retained Assessment semantics": {row["assessment_id"]: row["classification"] for row in rows(b, "assessment_reuse_classifications")} == {"ASM-B01": "Invalidated", "ASM-B02": "Retained", "ASM-B03": "Revalidation Required", "ASM-B04": "Retained"},
+        "A Decision Scope exact": [(row["change_item_id"], row["change_item_revision"]) for row in rows(a, "decision_scope_items")] == [("CI-A01", "r1")],
+        "A zero Decision Conditions": not rows(a, "decision_conditions"),
+        "B and C no Handover": b["derived"]["handover"] is None and c["derived"]["handover"] is None,
+        "C authority insufficiency non-terminal": c["derived"]["executions"]["IAX-C01"]["authority"]["escalation_required"] is True and not rows(c, "decision_records"),
+    }
+    for state in (a, b, c):
+        case = f"CHG-{state['scenario']}01"
+        results[f"{state['scenario']} case-local lineage"] = all(row.get("change_case_id", case) == case for table in state["tables"].values() for row in table)
+    return {name: {"passed": passed} for name, passed in results.items()}
+
+
+def integrity_results(actuals: Mapping[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Deterministic release-integrity catalogue, including all IT-16 families."""
+    a, b, c = actuals["A"], actuals["B"], actuals["C"]
+    def rows(state: dict[str, Any], table: str) -> list[dict[str, Any]]: return state["tables"][table]
+    def execution_case_local(state: dict[str, Any]) -> bool:
+        baselines = {row["assessment_baseline_id"]: row["change_case_id"] for row in rows(state, "assessment_baselines")}
+        overlays = {row["overlay_revision_id"]: row["change_case_id"] for row in rows(state, "overlay_revisions")}
+        return all(baselines.get(row["assessment_baseline_id"]) == row["change_case_id"] and overlays.get(row["overlay_revision_id"]) == row["change_case_id"] for row in rows(state, "impact_executions"))
+    family = {
+        "IT-16 execution baseline/overlay": all(execution_case_local(state) for state in (a, b, c)),
+        "IT-16 candidate provenance": all(provenance["change_item_id"].split("-")[1][0] == state["scenario"] for state in (a,b,c) for provenance in rows(state,"impact_candidate_provenance")),
+        "IT-16 Assessment fulfilment": all(obligation["fulfilled_by_assessment_id"] is None or obligation["fulfilled_by_assessment_id"].split("-")[1][0] == state["scenario"] for state in (a,b,c) for obligation in rows(state,"assessment_obligations")),
+        "IT-16 Assessment reuse": all(row["assessment_id"].startswith("ASM-B") and row["target_impact_execution_id"] == "IAX-B02" for row in rows(b,"assessment_reuse_classifications")),
+        "IT-16 Decision support": all(row["assessment_id"].startswith("ASM-A") and row["decision_record_id"] == "DEC-A01" for row in rows(a,"decision_support_assessments")),
+        "IT-16 Decision Scope": all(row["change_item_id"] == "CI-A01" and row["change_item_revision"] == "r1" for row in rows(a,"decision_scope_items")),
+    }
+    return {name: {"passed": passed} for name, passed in family.items()}

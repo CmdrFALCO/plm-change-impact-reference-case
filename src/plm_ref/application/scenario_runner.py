@@ -21,7 +21,10 @@ from plm_ref.application.overlay import OverlayRevisionInput, create_overlay_rev
 from plm_ref.application.readiness import derive_case_state, evaluate_authorisation_eligibility, evaluate_gate_b
 from plm_ref.application.routing import route_impact_execution
 from plm_ref.application.scope_routing import ScopeRouteCommand, evaluate_scope_route
-from plm_ref.application.oracle_verification import canonical_actual, compare_scenario
+from plm_ref.application.oracle_verification import (
+    canonical_actual, compare_scenario, cross_scenario_results, integrity_results,
+    load_expected, verify_historical_basis,
+)
 from plm_ref.application.source_projection import load_shared_source_fixture
 from plm_ref.infrastructure.db.models import ChangeCase, DecisionRecord, ImpactExecution
 from plm_ref.infrastructure.db.session import create_sqlite_engine
@@ -119,9 +122,11 @@ def verify_all(database_path: str | Path, evidence_path: str | Path = "evidence"
         (evidence / f"scenario_{s.lower()}_diff.json").write_text(json.dumps({"status": "PASS"} if not diffs[s] else {"status": "FAIL", "diffs": diffs[s]}, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     basis = actuals["A"]["derived"].get("historical_basis")
     (evidence / "decision_DEC-A01_basis.json").write_text(json.dumps(basis, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-    cross = actuals["A"]["derived"]["handover"] is not None and actuals["B"]["derived"]["handover"] is None and actuals["C"]["derived"]["handover"] is None
-    groups = {"Scenario A oracle": not diffs["A"], "Scenario B oracle": not diffs["B"], "Scenario C oracle": not diffs["C"], "Cross-scenario assertions": cross, "Integrity suite": True, "Historical reconstruction": basis is not None}
-    (evidence / "integrity_results.json").write_text(json.dumps(groups, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    cross = cross_scenario_results(actuals)
+    integrity = integrity_results(actuals)
+    historical_diffs = verify_historical_basis(actuals["A"], load_expected("A"))
+    groups = {"Scenario A oracle": not diffs["A"], "Scenario B oracle": not diffs["B"], "Scenario C oracle": not diffs["C"], "Cross-scenario assertions": all(result["passed"] for result in cross.values()), "Integrity suite": all(result["passed"] for result in integrity.values()), "Historical reconstruction": not historical_diffs}
+    (evidence / "integrity_results.json").write_text(json.dumps({"groups": groups, "cross_scenario": cross, "integrity": integrity, "historical_diffs": historical_diffs}, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     summary = "\n".join(f"{key} = {'PASS' if value else 'FAIL'}" for key, value in groups.items()) + "\n"
     (evidence / "verification_summary.md").write_text(summary, encoding="utf-8")
     return all(groups.values())
