@@ -39,3 +39,7 @@ class AssessmentCompletionError(DomainIntegrityError):
 
 class AssessmentReuseError(DomainIntegrityError):
     """Raised when reuse classification or retained fulfilment is invalid."""
+
+
+class HistoricalReconstructionError(DomainIntegrityError):
+    """Raised when persisted Decision lineage cannot be reconstructed safely."""
