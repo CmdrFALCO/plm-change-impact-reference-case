@@ -742,6 +742,9 @@ class DecisionSupportAssessment(Base):
 
 class DecisionScopeItem(Base):
     __tablename__ = "decision_scope_items"
+    __table_args__ = (
+        UniqueConstraint("change_item_id", "change_item_revision", name="uq_decision_scope_items_terminal_disposition"),
+    )
     decision_record_id: Mapped[str] = mapped_column(ForeignKey("decision_records.decision_record_id"), primary_key=True)
     change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     change_item_revision: Mapped[str] = mapped_column(String(32), primary_key=True)

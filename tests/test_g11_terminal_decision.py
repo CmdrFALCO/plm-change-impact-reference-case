@@ -13,9 +13,11 @@ from plm_ref.application.decision import (
     DecisionCommand, DecisionConditionInput, DecisionScopeInput, DecisionSupportInput,
     persist_terminal_decision,
 )
+from plm_ref.application.authority import EscalationCommand, evaluate_authority, persist_escalation
+from plm_ref.application.readiness import evaluate_authorisation_eligibility, evaluate_gate_b
 from plm_ref.application.source_projection import load_shared_source_fixture
 from plm_ref.infrastructure.db.models import (
-    ChangeCase, DecisionCondition, DecisionRecord, DecisionScopeItem, DecisionSupportAssessment,
+    ChangeCase, DecisionCondition, DecisionRecord, DecisionScopeItem, DecisionSupportAssessment, ProcessHistoryEntry,
 )
 from plm_ref.infrastructure.db.session import create_sqlite_engine
 from test_g07_assessment import _complete_scenario, _dt
@@ -101,3 +103,49 @@ def test_duplicate_and_sqlite_mutations_are_rejected(engine) -> None:
         with pytest.raises(IntegrityError):
             session.execute(text("UPDATE decision_records SET rationale = 'x' WHERE decision_record_id = 'DEC-A01'"))
         session.rollback()
+
+
+def test_change_item_revision_cannot_receive_second_terminal_disposition(engine) -> None:
+    with Session(engine) as session, session.begin():
+        _complete_scenario(session, "A")
+        persist_terminal_decision(session, _command())
+        with pytest.raises(ValueError):
+            persist_terminal_decision(session, _command(decision_record_id="DEC-A02"))
+        assert session.get(DecisionRecord, "DEC-A01") is not None
+        assert session.get(DecisionRecord, "DEC-A02") is None
+        session.execute(text("""
+            INSERT INTO decision_records (decision_record_id, change_case_id, assessment_baseline_id,
+              overlay_revision_id, impact_execution_id, required_authority_level, current_authority_level,
+              outcome, rationale, decision_authority, decision_timestamp)
+            VALUES ('DEC-A02', 'CHG-A01', 'BL-A01', 'OV-A01', 'IAX-A01', 'Standard', 'Standard',
+              'Authorised for Downstream Processing', 'fixture', 'fixture', '2026-08-25 20:01:00')
+        """))
+        with pytest.raises(IntegrityError):
+            session.execute(text("""
+                INSERT INTO decision_scope_items (decision_record_id, change_item_id, change_item_revision)
+                VALUES ('DEC-A02', 'CI-A01', 'r1')
+            """))
+        session.rollback()
+
+
+def test_insufficient_authority_cannot_persist_scenario_c_terminal_decision(engine) -> None:
+    with Session(engine) as session, session.begin():
+        _complete_scenario(session, "C")
+        gate = evaluate_gate_b(session, "IAX-C01")
+        eligibility = evaluate_authorisation_eligibility(session, gate)
+        authority = evaluate_authority(gate, eligibility)
+        persist_escalation(session, authority, EscalationCommand(
+            "HIST-C01", _dt("2026-08-25T22:20:00Z"), "Decision Coordinator C"))
+        command = DecisionCommand(
+            decision_record_id="DEC-C01", change_case_id="CHG-C01", assessment_baseline_id="BL-C01",
+            overlay_revision_id="OV-C01", impact_execution_id="IAX-C01",
+            outcome="Authorised for Downstream Processing", rationale="fixture",
+            decision_authority="Standard Decision Authority C", decision_timestamp=_dt("2026-08-25T22:20:00Z"),
+            scope_items=(DecisionScopeInput("CI-C01", "r1"),),
+            support_assessments=tuple(DecisionSupportInput(f"DSA-C0{i}", f"ASM-C0{i}") for i in range(1, 5)),
+            conditions=())
+        with pytest.raises(ValueError):
+            persist_terminal_decision(session, command)
+        assert session.get(DecisionRecord, "DEC-C01") is None
+        assert session.get(ChangeCase, "CHG-C01").case_state == "Decision Ready"
+        assert session.get(ProcessHistoryEntry, "HIST-C01") is not None

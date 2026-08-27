@@ -71,6 +71,13 @@ def _validate_scope(session: Session, execution: ImpactExecution, scope: tuple[D
     ).where(OverlayChangeItemMembership.overlay_revision_id == execution.overlay_revision_id)))
     if not keys <= overlay:
         raise ValueError("Decision Scope Item is absent from final Overlay Revision")
+    already_disposed = set(session.execute(select(
+        DecisionScopeItem.change_item_id, DecisionScopeItem.change_item_revision,
+    ).where(
+        DecisionScopeItem.change_item_id.in_([key[0] for key in keys]),
+    )))
+    if keys & already_disposed:
+        raise ValueError("Change Item revision already has a terminal Decision disposition")
     for key in keys:
         revision = session.get(ChangeItemRevision, key)
         if revision is None or revision.change_case_id != execution.change_case_id:
