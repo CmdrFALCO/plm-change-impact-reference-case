@@ -503,3 +503,185 @@ class ImpactCandidatePathStep(Base):
     relationship_type: Mapped[str] = mapped_column(String(128), nullable=False)
     target_reference: Mapped[str] = mapped_column(String(64), nullable=False)
     state_context: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class Assessment(Base):
+    __tablename__ = "assessments"
+    __table_args__ = (
+        CheckConstraint(
+            "domain IN ('Product Engineering', 'Validation', 'Manufacturing', "
+            "'Purchasing/Cost')",
+            name="ck_assessments_domain",
+        ),
+        CheckConstraint(
+            "assessment_state IN ('Planned', 'In Progress', 'Submitted', "
+            "'Returned', 'Complete', 'Withdrawn')",
+            name="ck_assessments_state",
+        ),
+        CheckConstraint(
+            "relevance IN ('Relevant', 'Not Relevant', 'Undetermined')",
+            name="ck_assessments_relevance",
+        ),
+        CheckConstraint(
+            "disposition IN ('No Objection', 'No Objection with Conditions', "
+            "'Objection', 'Escalation Recommended')",
+            name="ck_assessments_disposition",
+        ),
+        Index("ix_assessments_origin_execution_id", "origin_impact_execution_id"),
+    )
+
+    assessment_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(
+        ForeignKey("change_cases.change_case_id"), nullable=False
+    )
+    origin_impact_execution_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_executions.impact_execution_id"), nullable=False
+    )
+    domain: Mapped[str] = mapped_column(String(64), nullable=False)
+    assessment_state: Mapped[str] = mapped_column(String(32), nullable=False)
+    relevance: Mapped[str] = mapped_column(String(32), nullable=False)
+    disposition: Mapped[str] = mapped_column(String(64), nullable=False)
+    impact_statement: Mapped[str] = mapped_column(Text, nullable=False)
+    assessor: Mapped[str] = mapped_column(String(255), nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    is_locked: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class AssessmentObligation(Base):
+    __tablename__ = "assessment_obligations"
+    __table_args__ = (
+        CheckConstraint(
+            "domain IN ('Product Engineering', 'Validation', 'Manufacturing', "
+            "'Purchasing/Cost')",
+            name="ck_assessment_obligations_domain",
+        ),
+        CheckConstraint(
+            "routing_rule_reference IN ('RRR-01', 'RRR-02', 'RRR-03', 'RRR-04')",
+            name="ck_assessment_obligations_routing_rule",
+        ),
+        Index("ix_assessment_obligations_execution_id", "impact_execution_id"),
+    )
+
+    assessment_obligation_id: Mapped[str] = mapped_column(
+        String(64), primary_key=True
+    )
+    impact_execution_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_executions.impact_execution_id"), nullable=False
+    )
+    impact_candidate_id: Mapped[str | None] = mapped_column(
+        ForeignKey("impact_candidates.impact_candidate_id"), nullable=True
+    )
+    domain: Mapped[str] = mapped_column(String(64), nullable=False)
+    requirement_id: Mapped[str | None] = mapped_column(
+        ForeignKey("requirements.requirement_id"), nullable=True
+    )
+    mandatory: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    fulfilled_by_assessment_id: Mapped[str | None] = mapped_column(
+        ForeignKey("assessments.assessment_id"), nullable=True
+    )
+    routing_rule_reference: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class AssessmentImpactLink(Base):
+    __tablename__ = "assessment_impact_links"
+
+    assessment_id: Mapped[str] = mapped_column(
+        ForeignKey("assessments.assessment_id"), primary_key=True
+    )
+    impact_candidate_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_candidates.impact_candidate_id"), primary_key=True
+    )
+
+
+class AssessmentRequirementConclusion(Base):
+    __tablename__ = "assessment_requirement_conclusions"
+    __table_args__ = (
+        CheckConstraint(
+            "conclusion IN ('Satisfied', 'Not Satisfied', 'Not Demonstrated', "
+            "'Not Applicable')",
+            name="ck_assessment_requirement_conclusions_value",
+        ),
+        UniqueConstraint(
+            "assessment_id",
+            "requirement_id",
+            name="uq_assessment_requirement_conclusion",
+        ),
+    )
+
+    assessment_requirement_conclusion_id: Mapped[str] = mapped_column(
+        String(64), primary_key=True
+    )
+    assessment_id: Mapped[str] = mapped_column(
+        ForeignKey("assessments.assessment_id"), nullable=False
+    )
+    requirement_id: Mapped[str] = mapped_column(
+        ForeignKey("requirements.requirement_id"), nullable=False
+    )
+    conclusion: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
+class AssessmentEvidenceUse(Base):
+    __tablename__ = "assessment_evidence_uses"
+    __table_args__ = (
+        CheckConstraint(
+            "transferability_conclusion IS NULL OR "
+            "transferability_conclusion IN ('Accepted as Applicable', "
+            "'Partial Revalidation Required', 'Not Applicable to Proposed State')",
+            name="ck_assessment_evidence_uses_transferability",
+        ),
+        UniqueConstraint(
+            "assessment_id",
+            "evidence_record_id",
+            "evaluated_product_version_reference",
+            name="uq_assessment_evidence_use_context",
+        ),
+    )
+
+    assessment_evidence_use_id: Mapped[str] = mapped_column(
+        String(64), primary_key=True
+    )
+    assessment_id: Mapped[str] = mapped_column(
+        ForeignKey("assessments.assessment_id"), nullable=False
+    )
+    evidence_record_id: Mapped[str] = mapped_column(
+        ForeignKey("evidence_records.evidence_record_id"), nullable=False
+    )
+    evaluated_product_version_reference: Mapped[str] = mapped_column(
+        String(64), nullable=False
+    )
+    transferability_conclusion: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
+    evidence_state_token: Mapped[str] = mapped_column(String(128), nullable=False)
+    evidence_snapshot_payload: Mapped[dict[str, Any]] = mapped_column(
+        JSON, nullable=False
+    )
+
+
+class AssessmentReuseClassification(Base):
+    __tablename__ = "assessment_reuse_classifications"
+    __table_args__ = (
+        CheckConstraint(
+            "classification IN ('Retained', 'Revalidation Required', 'Invalidated')",
+            name="ck_assessment_reuse_classifications_value",
+        ),
+        UniqueConstraint(
+            "assessment_id",
+            "target_impact_execution_id",
+            name="uq_assessment_reuse_target_execution",
+        ),
+    )
+
+    assessment_reuse_classification_id: Mapped[str] = mapped_column(
+        String(64), primary_key=True
+    )
+    assessment_id: Mapped[str] = mapped_column(
+        ForeignKey("assessments.assessment_id"), nullable=False
+    )
+    target_impact_execution_id: Mapped[str] = mapped_column(
+        ForeignKey("impact_executions.impact_execution_id"), nullable=False
+    )
+    classification: Mapped[str] = mapped_column(String(32), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)

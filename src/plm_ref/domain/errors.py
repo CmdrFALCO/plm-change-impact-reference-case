@@ -23,3 +23,11 @@ class ImpactExecutionLineageError(DomainIntegrityError):
 
 class ImpactResultValidationError(DomainIntegrityError):
     """Raised when adapter output violates structured impact invariants."""
+
+
+class RoutingEligibilityError(DomainIntegrityError):
+    """Raised when routing cannot start from the execution lifecycle state."""
+
+
+class RoutingInputError(DomainIntegrityError):
+    """Raised when a frozen RRR-v0.1 input cannot be evaluated deterministically."""
