@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from plm_ref.domain.errors import ImmutableRecordError
 from plm_ref.infrastructure.db.models import (
+    Assessment,
     AssessmentBaseline,
     BaselineMember,
     ChangeItemRevision,
@@ -13,6 +14,15 @@ from plm_ref.infrastructure.db.models import (
     OverlayRevision,
     ProductVersion,
 )
+
+
+def assert_assessment_mutable(session: Session, assessment_id: str) -> Assessment:
+    assessment = session.get(Assessment, assessment_id)
+    if assessment is None:
+        raise ValueError(f"Assessment {assessment_id} does not exist")
+    if assessment.is_locked:
+        raise ImmutableRecordError(f"Assessment {assessment_id} is locked")
+    return assessment
 
 
 def is_product_version_captured_in_baseline(session: Session, product_version_id: str) -> bool:

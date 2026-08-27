@@ -31,3 +31,7 @@ class RoutingEligibilityError(DomainIntegrityError):
 
 class RoutingInputError(DomainIntegrityError):
     """Raised when a frozen RRR-v0.1 input cannot be evaluated deterministically."""
+
+
+class AssessmentCompletionError(DomainIntegrityError):
+    """Raised when an Assessment cannot be completed as one frozen semantic unit."""
