@@ -9,15 +9,14 @@ from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
 from plm_ref.application.baseline import BaselineReuseInputs, reuse_assessment_baseline
-from plm_ref.application.change_case import create_change_item
+from plm_ref.application.change_case import ChangeItemRevisionInput, ProposalStateInput, create_change_item
 from plm_ref.application.gate_a import evaluate_gate_a
 from plm_ref.application.overlay import OverlayRevisionInput, create_overlay_revision
 from plm_ref.application.scope_routing import ScopeRouteCommand, evaluate_scope_route
 from plm_ref.application.source_projection import load_shared_source_fixture
-from plm_ref.infrastructure.db.models import Assessment, AssessmentBaseline, AssessmentImpactLink, AssessmentRequirementConclusion, ChangeItem, OverlayChangeItemMembership, OverlayLocalObject, ProcessHistoryEntry
+from plm_ref.infrastructure.db.models import Assessment, AssessmentBaseline, AssessmentImpactLink, AssessmentRequirementConclusion, ChangeItem, ChangeItemProposalState, ChangeItemRevision, OverlayChangeItemMembership, OverlayLocalObject, ProcessHistoryEntry
 from plm_ref.infrastructure.db.session import create_sqlite_engine
 from plm_ref.rules.rrr_v01 import Rrr05Input, evaluate_rrr05
-from test_g05_impact_execution import _applicability, _proposal
 from test_g07_assessment import _complete_scenario, _dt, _prepare
 
 
@@ -42,6 +41,24 @@ def _command() -> ScopeRouteCommand:
         "ASM-B01 concluded that PSO-002 applicability must change explicitly; discovered impact is not authorised scope.")
 
 
+def _b02_revision() -> ChangeItemRevisionInput:
+    return ChangeItemRevisionInput(
+        change_item_id="CI-B02", change_item_revision="r1", change_case_id="CHG-B01",
+        action="Change Applicability", target_type="Product Structure Occurrence", target_id="PSO-002",
+        current_state_reference={"occurrence_id": "PSO-002", "applicability_rule_id": "APP-001", "applicability_rule_version": "1"},
+        proposed_state_payload={"applicability_rule": {"rule_id": "APP-B02",
+            "expression": 'CoolingType = "Liquid" AND PackFamily = "LongRange"', "rule_version": "1"}},
+        reason="Align occurrence applicability with the validated scope of the proposed Cooling Plate state.",
+        owner="Change Owner B", configuration_context_id="CFG-001",
+        intended_effectivity={"effectivity_type": "Planned Engineering Effective Date", "planned_effective_date": "2026-11-01"},
+        revision_created_at=_dt("2026-08-25T21:05:00Z"))
+
+
+def _b02_proposal() -> ProposalStateInput:
+    return ProposalStateInput(change_item_id="CI-B02", change_case_id="CHG-B01", selected_revision="r1",
+        proposal_state="Active", state_changed_at=_dt("2026-08-25T21:06:00Z"), state_changed_by="Change Owner B")
+
+
 def test_it10_b_scope_route_then_explicit_amendment_and_overlay(engine) -> None:
     with Session(engine) as session, session.begin():
         _complete_scenario(session, "B")
@@ -55,7 +72,25 @@ def test_it10_b_scope_route_then_explicit_amendment_and_overlay(engine) -> None:
                 "ASM-B01 concluded that PSO-002 applicability must change explicitly; discovered impact is not authorised scope.",
                 "CI-B01", "r1")
         assert session.get(ChangeItem, "CI-B02") is None
-        create_change_item(session, _applicability(), _proposal("B", "CI-B02"))
+        create_change_item(session, _b02_revision(), _b02_proposal())
+        revision = session.get(ChangeItemRevision, ("CI-B02", "r1"))
+        assert revision is not None
+        assert (revision.change_case_id, revision.action, revision.target_type, revision.target_id,
+                revision.current_state_reference, revision.proposed_state_payload, revision.reason,
+                revision.owner, revision.configuration_context_id, revision.intended_effectivity,
+                revision.revision_created_at) == (
+                "CHG-B01", "Change Applicability", "Product Structure Occurrence", "PSO-002",
+                {"occurrence_id": "PSO-002", "applicability_rule_id": "APP-001", "applicability_rule_version": "1"},
+                {"applicability_rule": {"rule_id": "APP-B02", "expression": 'CoolingType = "Liquid" AND PackFamily = "LongRange"', "rule_version": "1"}},
+                "Align occurrence applicability with the validated scope of the proposed Cooling Plate state.",
+                "Change Owner B", "CFG-001",
+                {"effectivity_type": "Planned Engineering Effective Date", "planned_effective_date": "2026-11-01"},
+                _dt("2026-08-25T21:05:00Z").replace(tzinfo=None))
+        b01_proposal = session.get(ChangeItemProposalState, "CI-B01")
+        b02_proposal = session.get(ChangeItemProposalState, "CI-B02")
+        assert (b01_proposal.proposal_state, b02_proposal.change_case_id, b02_proposal.selected_revision,
+                b02_proposal.proposal_state, b02_proposal.state_changed_at, b02_proposal.state_changed_by) == (
+                "Active", "CHG-B01", "r1", "Active", _dt("2026-08-25T21:06:00Z").replace(tzinfo=None), "Change Owner B")
         gate = evaluate_gate_a(session, "CHG-B01")
         assert gate.passed and gate.active_change_items == ("CI-B01:r1", "CI-B02:r1")
         inputs = BaselineReuseInputs(authoritative_current_state_unchanged=True,
