@@ -48,22 +48,34 @@
   "historical_diffs": [],
   "integrity": {
     "IT-16 Assessment fulfilment": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     },
     "IT-16 Assessment reuse": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     },
     "IT-16 Decision Scope": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     },
     "IT-16 Decision support": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     },
     "IT-16 candidate provenance": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     },
     "IT-16 execution baseline/overlay": {
-      "passed": true
+      "attempted": true,
+      "passed": true,
+      "rejected": true
     }
   }
 }

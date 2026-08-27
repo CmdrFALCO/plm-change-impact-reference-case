@@ -8,10 +8,12 @@ import pytest
 from sqlalchemy.orm import Session
 
 from plm_ref.application.oracle_verification import (
-    _diff, canonical_actual, cross_scenario_results, integrity_results,
+    _diff, canonical_actual, cross_scenario_results,
     compare_scenario, load_expected, verify_historical_basis,
 )
-from plm_ref.application.scenario_runner import reset_database, run_scenario, verify_all
+from plm_ref.application.scenario_runner import (
+    it16_injection_results, reset_database, run_scenario, verify_all,
+)
 
 
 @pytest.mark.parametrize("scenario", ["A", "B", "C"])
@@ -52,7 +54,7 @@ def test_g14_strict_diff_rejects_unexpected_actual_key_and_historical_mismatch(t
     finally: engine.dispose()
 
 
-def test_g14_cross_scenario_and_every_it16_family_are_derived(tmp_path: Path) -> None:
+def test_g14_cross_scenario_results_are_derived(tmp_path: Path) -> None:
     actuals = {}
     for scenario in ("A", "B", "C"):
         engine = reset_database(tmp_path / f"{scenario}.db")
@@ -61,11 +63,27 @@ def test_g14_cross_scenario_and_every_it16_family_are_derived(tmp_path: Path) ->
             with Session(engine) as session: actuals[scenario] = canonical_actual(session, scenario)
         finally: engine.dispose()
     assert all(result["passed"] for result in cross_scenario_results(actuals).values())
-    results = integrity_results(actuals)
+
+
+@pytest.mark.parametrize("family", [
+    "IT-16 execution baseline/overlay",
+    "IT-16 candidate provenance",
+    "IT-16 Assessment fulfilment",
+    "IT-16 Assessment reuse",
+    "IT-16 Decision support",
+    "IT-16 Decision Scope",
+])
+def test_g14_it16_attempts_and_rejects_each_cross_case_injection(it16_results: dict, family: str) -> None:
+    results = it16_results
     assert set(results) == {
         "IT-16 execution baseline/overlay", "IT-16 candidate provenance", "IT-16 Assessment fulfilment",
         "IT-16 Assessment reuse", "IT-16 Decision support", "IT-16 Decision Scope"}
-    assert all(result["passed"] for result in results.values())
+    assert results[family] == {"attempted": True, "rejected": True, "passed": True}
+
+
+@pytest.fixture(scope="module")
+def it16_results(tmp_path_factory: pytest.TempPathFactory) -> dict:
+    return it16_injection_results(tmp_path_factory.mktemp("it16") / "it16.db")
 
 
 def test_g14_evidence_is_deterministic_and_has_six_pass_groups(tmp_path: Path) -> None:
@@ -76,6 +94,8 @@ def test_g14_evidence_is_deterministic_and_has_six_pass_groups(tmp_path: Path) -
     assert {path.name: path.read_bytes() for path in evidence.iterdir()} == first
     groups = json.loads((evidence / "integrity_results.json").read_text())["groups"]
     assert all(groups.values()) and len(groups) == 6
+    integrity = json.loads((evidence / "integrity_results.json").read_text())["integrity"]
+    assert all(result == {"attempted": True, "rejected": True, "passed": True} for result in integrity.values())
     assert {path.name for path in evidence.iterdir()} == {
         "scenario_a_actual.json", "scenario_a_diff.json", "scenario_b_actual.json", "scenario_b_diff.json",
         "scenario_c_actual.json", "scenario_c_diff.json", "decision_DEC-A01_basis.json", "integrity_results.json", "verification_summary.md"}

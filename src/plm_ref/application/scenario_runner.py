@@ -22,11 +22,16 @@ from plm_ref.application.readiness import derive_case_state, evaluate_authorisat
 from plm_ref.application.routing import route_impact_execution
 from plm_ref.application.scope_routing import ScopeRouteCommand, evaluate_scope_route
 from plm_ref.application.oracle_verification import (
-    canonical_actual, compare_scenario, cross_scenario_results, integrity_results,
-    load_expected, verify_historical_basis,
+    canonical_actual, compare_scenario, cross_scenario_results, load_expected,
+    verify_historical_basis,
 )
 from plm_ref.application.source_projection import load_shared_source_fixture
-from plm_ref.infrastructure.db.models import ChangeCase, DecisionRecord, ImpactExecution
+from plm_ref.infrastructure.db.models import (
+    Assessment, AssessmentObligation, AssessmentReuseClassification, ChangeCase, DecisionRecord,
+    ImpactCandidate, ImpactCandidateProvenance, ImpactExecution, ProductElement,
+)
+from plm_ref.domain.errors import AssessmentCompletionError, AssessmentReuseError, ImpactExecutionLineageError
+from plm_ref.infrastructure.impact.port import ImpactCandidateSpec
 from plm_ref.infrastructure.db.session import create_sqlite_engine
 from plm_ref.infrastructure.impact.frozen_fixture_adapter import FrozenFixtureImpactAdapter
 
@@ -52,7 +57,10 @@ def load_scenario(session: Session, scenario: str) -> str:
     s=scenario.upper(); case,item,_,_,_,created,revision,proposal,*tail=_v(s)
     if session.get(ChangeCase,case): return case
     owner,material,scope,trigger,title,rationale,reason=tail[-7:]
-    load_shared_source_fixture(session)
+    # An injection harness may load two independent cases into one database.  The
+    # shared projection is source state, so load it once rather than duplicating it.
+    if session.get(ProductElement, "PE-002") is None:
+        load_shared_source_fixture(session)
     create_change_case(session,ChangeCaseInput(change_case_id=case,title=title,trigger=trigger,rationale=rationale,change_owner=owner,case_state="Open",process_iteration=1,created_at=_time(created),closed_at=None))
     create_change_item(session,ChangeItemRevisionInput(change_item_id=item,change_item_revision="r1",change_case_id=case,action="Revise Product State",target_type="Product Version",target_id="PV-003",current_state_reference={"product_version_id":"PV-003","revision":"A","iteration":"1"},proposed_state_payload={"product_element_id":"PE-003","proposed_revision":"B","proposed_iteration":"1","supersedes_product_version_id":"PV-003","material_characteristic":material,"validated_configuration_scope":scope,"intended_function_change":False},reason=reason,owner=owner,configuration_context_id="CFG-001",intended_effectivity={"effectivity_type":"Planned Engineering Effective Date","planned_effective_date":"2026-11-01"},revision_created_at=_time(revision)),ProposalStateInput(change_item_id=item,change_case_id=case,selected_revision="r1",proposal_state="Active",state_changed_at=_time(proposal),state_changed_by=owner))
     return case
@@ -104,6 +112,148 @@ def reset_database(database_path: str | Path) -> Engine:
     command.upgrade(config,"head")
     return create_sqlite_engine(path)
 
+
+def _it16_command(decision_id: str, scope: tuple[DecisionScopeInput, ...], support: tuple[DecisionSupportInput, ...]) -> DecisionCommand:
+    """A bounded A command used only to exercise Decision case-local guards."""
+    return DecisionCommand(
+        decision_id, "CHG-A01", "BL-A01", "OV-A01", "IAX-A01",
+        "Authorised for Downstream Processing",
+        "IT-16 cross-case injection must be rejected.",
+        "Standard Decision Authority A", _time("20:00"), scope, support, (),
+    )
+
+
+def it16_injection_results(database_path: str | Path) -> dict[str, dict[str, bool]]:
+    """Attempt each frozen cross-case mutation against real application services.
+
+    This deliberately uses a fresh database and stops before A's terminal Decision;
+    it is verification scaffolding, not scenario state or an alternative workflow.
+    """
+    engine = reset_database(database_path)
+    try:
+        with Session(engine) as session, session.begin():
+            _execute(session, "A"); _complete(session, "A", "IAX-A01")
+            _execute(session, "C"); _complete(session, "C", "IAX-C01")
+            results: dict[str, dict[str, bool]] = {}
+
+            # 1. A execution cannot select C's baseline.
+            rejected = False
+            try:
+                execute_impact_analysis(session, ImpactExecutionInput(
+                    impact_execution_id="IAX-IT16-X", change_case_id="CHG-A01",
+                    assessment_baseline_id="BL-C01", overlay_revision_id="OV-A01",
+                    rule_set_version="RRR-v0.1", execution_timestamp=_time("23:00"),
+                ), FrozenFixtureImpactAdapter())
+            except ImpactExecutionLineageError:
+                rejected = True
+            results["IT-16 execution baseline/overlay"] = {
+                "attempted": True, "rejected": rejected,
+                "passed": rejected and session.get(ImpactExecution, "IAX-IT16-X") is None,
+            }
+
+            # 2. Adapter provenance naming CI-C01 for an A overlay is failed atomically.
+            class _CrossCaseProvenanceAdapter:
+                def run(self, _context):
+                    return (ImpactCandidateSpec.model_validate({
+                        "impact_candidate_id": "IC-IT16-X", "candidate_type": "Product Version",
+                        "candidate_reference": "PV-003", "affected_domain": "Validation",
+                        "provenance": ({
+                            "impact_candidate_provenance_id": "ICP-IT16-X",
+                            "change_item_id": "CI-C01", "change_item_revision": "r1",
+                            "dependency_path": ({"sequence": 1, "source_reference": "BM-A01-01",
+                                "relationship_type": "depends on", "target_reference": "BM-A01-02",
+                                "state_context": "Current State"},),
+                        },),
+                    }),)
+            execute_impact_analysis(session, ImpactExecutionInput(
+                impact_execution_id="IAX-IT16-P", change_case_id="CHG-A01",
+                assessment_baseline_id="BL-A01", overlay_revision_id="OV-A01",
+                rule_set_version="RRR-v0.1", execution_timestamp=_time("23:01"),
+            ), _CrossCaseProvenanceAdapter())
+            failed = session.get(ImpactExecution, "IAX-IT16-P")
+            rejected = failed is not None and failed.execution_status == "Failed"
+            results["IT-16 candidate provenance"] = {
+                "attempted": True, "rejected": rejected,
+                "passed": rejected and session.get(ImpactCandidate, "IC-IT16-X") is None
+                and session.get(ImpactCandidateProvenance, "ICP-IT16-X") is None,
+            }
+
+            # 3. C cannot complete an Assessment against an A obligation.
+            session.add(AssessmentObligation(
+                assessment_obligation_id="AO-IT16-F", impact_execution_id="IAX-A01",
+                impact_candidate_id="IC-A02", domain="Validation", requirement_id="REQ-002",
+                mandatory=True, fulfilled_by_assessment_id=None, routing_rule_reference="RRR-02",
+            ))
+            session.flush()
+            rejected = False
+            try:
+                complete_assessment(session, AssessmentCompletionInput(
+                    "ASM-IT16-F", "CHG-C01", "IAX-C01", "Validation", "Relevant",
+                    "No Objection", "Malformed cross-case IT-16 injection.",
+                    "IT-16 Assessor", _time("23:02"), ("IC-C02",),
+                    (RequirementConclusionInput("ARC-IT16-F", "REQ-002", "Satisfied"),),
+                    (EvidenceUseInput("AEU-IT16-F", "EV-001", "OVOBJ-C01-PV",
+                        "Accepted as Applicable", "EV-001@2026-08-25T18:10:00Z"),),
+                    ("AO-IT16-F",),
+                ))
+            except AssessmentCompletionError:
+                rejected = True
+            results["IT-16 Assessment fulfilment"] = {
+                "attempted": True, "rejected": rejected,
+                "passed": rejected and session.get(Assessment, "ASM-IT16-F") is None
+                and session.get(AssessmentObligation, "AO-IT16-F").fulfilled_by_assessment_id is None,
+            }
+
+            # 4. A directly injected C-to-A Retained classification cannot be used
+            # through the reuse service and is removed as invalid verification data.
+            reuse_obligation = AssessmentObligation(
+                assessment_obligation_id="AO-IT16-R", impact_execution_id="IAX-A01",
+                impact_candidate_id="IC-A02", domain="Validation", requirement_id="REQ-002",
+                mandatory=True, fulfilled_by_assessment_id=None, routing_rule_reference="RRR-02",
+            )
+            cross_classification = AssessmentReuseClassification(
+                assessment_reuse_classification_id="ARU-IT16-R", assessment_id="ASM-C02",
+                target_impact_execution_id="IAX-A01", classification="Retained",
+                rationale="Malformed cross-case IT-16 reuse injection.",
+            )
+            session.add_all((reuse_obligation, cross_classification)); session.flush()
+            reuse_rejected = False
+            try:
+                fulfil_from_retained_assessments(session, (RetainedFulfilment("AO-IT16-R", "ASM-C02"),))
+            except AssessmentReuseError:
+                reuse_rejected = True
+            session.delete(cross_classification); session.flush()
+            results["IT-16 Assessment reuse"] = {
+                "attempted": True, "rejected": reuse_rejected,
+                "passed": reuse_rejected and reuse_obligation.fulfilled_by_assessment_id is None
+                and session.get(AssessmentReuseClassification, "ARU-IT16-R") is None,
+            }
+
+            correct_support = tuple(DecisionSupportInput(f"DSA-IT16-{i}", f"ASM-A0{i}") for i in range(1, 5))
+            rejected = False
+            try:
+                bad_support = correct_support[:-1] + (DecisionSupportInput("DSA-IT16-X", "ASM-C04"),)
+                persist_terminal_decision(session, _it16_command("DEC-IT16-S", (DecisionScopeInput("CI-A01", "r1"),), bad_support))
+            except ValueError:
+                rejected = True
+            results["IT-16 Decision support"] = {
+                "attempted": True, "rejected": rejected,
+                "passed": rejected and session.get(DecisionRecord, "DEC-IT16-S") is None,
+            }
+
+            rejected = False
+            try:
+                persist_terminal_decision(session, _it16_command("DEC-IT16-C", (DecisionScopeInput("CI-C01", "r1"),), correct_support))
+            except ValueError:
+                rejected = True
+            results["IT-16 Decision Scope"] = {
+                "attempted": True, "rejected": rejected,
+                "passed": rejected and session.get(DecisionRecord, "DEC-IT16-C") is None,
+            }
+            return results
+    finally:
+        engine.dispose()
+
 def verify_all(database_path: str | Path, evidence_path: str | Path = "evidence") -> bool:
     """Run clean A/B/C oracle checks and write deterministic technical evidence."""
     import json
@@ -123,7 +273,8 @@ def verify_all(database_path: str | Path, evidence_path: str | Path = "evidence"
     basis = actuals["A"]["derived"].get("historical_basis")
     (evidence / "decision_DEC-A01_basis.json").write_text(json.dumps(basis, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     cross = cross_scenario_results(actuals)
-    integrity = integrity_results(actuals)
+    # IT-16 is an active injection suite, not a post-hoc ID-prefix inspection.
+    integrity = it16_injection_results(Path(database_path).with_name("it16_injections.db"))
     historical_diffs = verify_historical_basis(actuals["A"], load_expected("A"))
     groups = {"Scenario A oracle": not diffs["A"], "Scenario B oracle": not diffs["B"], "Scenario C oracle": not diffs["C"], "Cross-scenario assertions": all(result["passed"] for result in cross.values()), "Integrity suite": all(result["passed"] for result in integrity.values()), "Historical reconstruction": not historical_diffs}
     (evidence / "integrity_results.json").write_text(json.dumps({"groups": groups, "cross_scenario": cross, "integrity": integrity, "historical_diffs": historical_diffs}, sort_keys=True, indent=2) + "\n", encoding="utf-8")
