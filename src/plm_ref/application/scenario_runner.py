@@ -30,9 +30,9 @@ from plm_ref.infrastructure.impact.frozen_fixture_adapter import FrozenFixtureIm
 def _dt(value: str) -> datetime: return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 _S = {
- "A": ("CHG-A01","CI-A01","BL-A01","OV-A01","IAX-A01","19:00","19:02","19:03","19:20","19:25","Change Owner A","MC-A-01",'CoolingType = "Liquid"',"Synthetic supplier process change"),
- "B": ("CHG-B01","CI-B01","BL-B01","OV-B01","IAX-B01","20:10","20:12","20:13","20:30","20:35","Change Owner B","MC-B-01",'CoolingType = "Liquid" AND PackFamily = "LongRange"',"Synthetic supplier process change"),
- "C": ("CHG-C01","CI-C01","BL-C01","OV-C01","IAX-C01","21:30","21:32","21:33","21:50","21:55","Change Owner C","MC-C-01",'CoolingType = "Liquid"',"Synthetic supplier process change with elevated authority classification"),}
+ "A": ("CHG-A01","CI-A01","BL-A01","OV-A01","IAX-A01","19:00","19:02","19:03","19:20","19:25","Change Owner A","MC-A-01",'CoolingType = "Liquid"',"Synthetic supplier process change","Cooling Plate supplier-process material characteristic update","Update one Cooling Plate material characteristic while preserving intended function and current applicability.","Synthetic supplier process change."),
+ "B": ("CHG-B01","CI-B01","BL-B01","OV-B01","IAX-B01","20:10","20:12","20:13","20:30","20:35","Change Owner B","MC-B-01",'CoolingType = "Liquid" AND PackFamily = "LongRange"',"Synthetic supplier process change","Cooling Plate material revision requiring applicability scope amendment","Evaluate a proposed Cooling Plate material characteristic whose validated configuration scope is narrower than the current occurrence applicability.","Synthetic supplier process change with a narrower validated configuration scope."),
+ "C": ("CHG-C01","CI-C01","BL-C01","OV-C01","IAX-C01","21:30","21:32","21:33","21:50","21:55","Change Owner C","MC-C-01",'CoolingType = "Liquid"',"Synthetic supplier process change with elevated authority classification","Cooling Plate change requiring Elevated authority","Evaluate a bounded Cooling Plate product-state revision whose decision route requires Elevated authority.","Synthetic change prepared under a route that requires Elevated authority."),}
 _DOMAINS=("Product Engineering","Validation","Manufacturing","Purchasing/Cost")
 _ROLES=("Product Engineer","Validation Engineer","Manufacturing Engineer","Purchasing/Cost Assessor")
 _EVIDENCE=("EV-003","EV-001","EV-002","EV-004")
@@ -47,10 +47,10 @@ def load_scenario(session: Session, scenario: str) -> str:
     """Load shared source plus explicit case/change-item input, never an oracle."""
     s=scenario.upper(); case,item,_,_,_,created,revision,proposal,*tail=_v(s)
     if session.get(ChangeCase,case): return case
-    owner,material,scope,trigger=tail[-4:]
+    owner,material,scope,trigger,title,rationale,reason=tail[-7:]
     load_shared_source_fixture(session)
-    create_change_case(session,ChangeCaseInput(change_case_id=case,title=f"{case} frozen case",trigger=trigger,rationale="Frozen scenario rationale.",change_owner=owner,case_state="Open",process_iteration=1,created_at=_time(created),closed_at=None))
-    create_change_item(session,ChangeItemRevisionInput(change_item_id=item,change_item_revision="r1",change_case_id=case,action="Revise Product State",target_type="Product Version",target_id="PV-003",current_state_reference={"product_version_id":"PV-003","revision":"A","iteration":"1"},proposed_state_payload={"product_element_id":"PE-003","proposed_revision":"B","proposed_iteration":"1","supersedes_product_version_id":"PV-003","material_characteristic":material,"validated_configuration_scope":scope,"intended_function_change":False},reason="Frozen synthetic change.",owner=owner,configuration_context_id="CFG-001",intended_effectivity={"effectivity_type":"Planned Engineering Effective Date","planned_effective_date":"2026-11-01"},revision_created_at=_time(revision)),ProposalStateInput(change_item_id=item,change_case_id=case,selected_revision="r1",proposal_state="Active",state_changed_at=_time(proposal),state_changed_by=owner))
+    create_change_case(session,ChangeCaseInput(change_case_id=case,title=title,trigger=trigger,rationale=rationale,change_owner=owner,case_state="Open",process_iteration=1,created_at=_time(created),closed_at=None))
+    create_change_item(session,ChangeItemRevisionInput(change_item_id=item,change_item_revision="r1",change_case_id=case,action="Revise Product State",target_type="Product Version",target_id="PV-003",current_state_reference={"product_version_id":"PV-003","revision":"A","iteration":"1"},proposed_state_payload={"product_element_id":"PE-003","proposed_revision":"B","proposed_iteration":"1","supersedes_product_version_id":"PV-003","material_characteristic":material,"validated_configuration_scope":scope,"intended_function_change":False},reason=reason,owner=owner,configuration_context_id="CFG-001",intended_effectivity={"effectivity_type":"Planned Engineering Effective Date","planned_effective_date":"2026-11-01"},revision_created_at=_time(revision)),ProposalStateInput(change_item_id=item,change_case_id=case,selected_revision="r1",proposal_state="Active",state_changed_at=_time(proposal),state_changed_by=owner))
     return case
 
 def _execute(session: Session,s: str) -> str:
@@ -86,10 +86,12 @@ def run_scenario(session: Session, scenario: str) -> str:
         gate=evaluate_gate_b(session,execution); eligibility=evaluate_authorisation_eligibility(session,gate); derive_case_state(session,gate)
         if evaluate_authority(gate,eligibility).decision_permitted is not True: raise ValueError("frozen A authority disposition failed")
         persist_terminal_decision(session,DecisionCommand("DEC-A01","CHG-A01","BL-A01","OV-A01","IAX-A01","Authorised for Downstream Processing","Decision package is complete, substantive authorisation blockers are absent, and Standard authority is sufficient.","Standard Decision Authority A",_time("20:00"),(DecisionScopeInput("CI-A01","r1"),),tuple(DecisionSupportInput(f"DSA-A0{i}",f"ASM-A0{i}") for i in range(1,5)),()))
-    elif s=="B": _run_b02(session)
+    elif s=="B":
+        _run_b02(session)
+        derive_case_state(session, evaluate_gate_b(session, "IAX-B02"))
     else:
         gate=evaluate_gate_b(session,execution); eligibility=evaluate_authorisation_eligibility(session,gate); derive_case_state(session,gate)
-        persist_escalation(session,evaluate_authority(gate,eligibility),EscalationCommand("HIST-C01",_time("22:20"),"Standard Decision Authority C"))
+        persist_escalation(session,evaluate_authority(gate,eligibility),EscalationCommand("HIST-C01",_time("22:20"),"Decision Coordinator C"))
     return case
 
 def reset_database(database_path: str | Path) -> Engine:
