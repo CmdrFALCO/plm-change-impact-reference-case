@@ -709,3 +709,50 @@ class ProcessHistoryEntry(Base):
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     affected_change_item_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     affected_change_item_revision: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+
+class DecisionRecord(Base):
+    __tablename__ = "decision_records"
+    __table_args__ = (
+        CheckConstraint("required_authority_level IN ('Standard', 'Elevated')", name="ck_decision_records_required_authority"),
+        CheckConstraint("current_authority_level IN ('Standard', 'Elevated')", name="ck_decision_records_current_authority"),
+        CheckConstraint("outcome IN ('Authorised for Downstream Processing', 'Authorised with Conditions', 'Rejected')", name="ck_decision_records_outcome"),
+        Index("ix_decision_records_change_case_id", "change_case_id"),
+    )
+    decision_record_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(ForeignKey("change_cases.change_case_id"), nullable=False)
+    assessment_baseline_id: Mapped[str] = mapped_column(ForeignKey("assessment_baselines.assessment_baseline_id"), nullable=False)
+    overlay_revision_id: Mapped[str] = mapped_column(ForeignKey("overlay_revisions.overlay_revision_id"), nullable=False)
+    impact_execution_id: Mapped[str] = mapped_column(ForeignKey("impact_executions.impact_execution_id"), nullable=False)
+    required_authority_level: Mapped[str] = mapped_column(String(32), nullable=False)
+    current_authority_level: Mapped[str] = mapped_column(String(32), nullable=False)
+    outcome: Mapped[str] = mapped_column(String(64), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)
+    decision_authority: Mapped[str] = mapped_column(String(255), nullable=False)
+    decision_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class DecisionSupportAssessment(Base):
+    __tablename__ = "decision_support_assessments"
+    __table_args__ = (UniqueConstraint("decision_record_id", "assessment_id", name="uq_decision_support_assessment"),)
+    decision_support_assessment_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    decision_record_id: Mapped[str] = mapped_column(ForeignKey("decision_records.decision_record_id"), nullable=False)
+    assessment_id: Mapped[str] = mapped_column(ForeignKey("assessments.assessment_id"), nullable=False)
+
+
+class DecisionScopeItem(Base):
+    __tablename__ = "decision_scope_items"
+    decision_record_id: Mapped[str] = mapped_column(ForeignKey("decision_records.decision_record_id"), primary_key=True)
+    change_item_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_item_revision: Mapped[str] = mapped_column(String(32), primary_key=True)
+
+
+class DecisionCondition(Base):
+    __tablename__ = "decision_conditions"
+    __table_args__ = (CheckConstraint("required_before_stage IN ('Pre-implementation', 'Pre-release', 'Post-implementation monitoring')", name="ck_decision_conditions_stage"),)
+    decision_condition_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    decision_record_id: Mapped[str] = mapped_column(ForeignKey("decision_records.decision_record_id"), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    responsible_downstream_role: Mapped[str] = mapped_column(String(255), nullable=False)
+    required_before_stage: Mapped[str] = mapped_column(String(64), nullable=False)
+    expected_completion_evidence: Mapped[str] = mapped_column(Text, nullable=False)

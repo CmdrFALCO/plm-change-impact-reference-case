@@ -27,7 +27,7 @@ from plm_ref.application.scope_routing import evaluate_scope_route
 from plm_ref.application.source_projection import load_shared_source_fixture
 from plm_ref.domain.errors import AssessmentCompletionError
 from plm_ref.infrastructure.db.models import (
-    AssessmentObligation, ChangeCase, ImpactExecution, OpenItem, ProcessHistoryEntry,
+    AssessmentObligation, ChangeCase, DecisionRecord, ImpactExecution, OpenItem, ProcessHistoryEntry,
 )
 from plm_ref.infrastructure.db.session import create_sqlite_engine
 from test_g07_assessment import _complete_scenario, _dt, _input, _prepare
@@ -79,7 +79,7 @@ def test_scenario_a_gate_b_authority_and_no_terminal_decision(engine) -> None:
                 authority.decision_permitted, authority.escalation_required) == (
             "Standard", True, True, False)
         assert derive_case_state(session, gate).case_state == "Decision Ready"
-        assert not inspect(session.bind).has_table("decision_records")
+        assert session.scalar(select(DecisionRecord.decision_record_id)) is None
 
 
 def test_scenario_b_stops_before_rrr06_and_remains_in_assessment(engine) -> None:
@@ -130,7 +130,7 @@ def test_it12_scenario_c_escalates_non_terminal_and_is_idempotent(engine) -> Non
                 "HIST-C01", _dt("2026-08-25T22:20:00Z"), "Decision Coordinator C"))
         assert session.scalar(select(ProcessHistoryEntry.process_history_id).where(
             ProcessHistoryEntry.process_history_id == "HIST-C01")) == "HIST-C01"
-        assert not inspect(session.bind).has_table("decision_records")
+        assert session.scalar(select(DecisionRecord.decision_record_id)) is None
 
 
 @pytest.mark.parametrize(("disposition", "conclusion"), [

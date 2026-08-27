@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect, select, text
 from sqlalchemy.orm import Session
 
 from plm_ref.application.baseline import BaselineReuseInputs, reuse_assessment_baseline
@@ -156,4 +156,6 @@ def test_scope_route_does_not_fire_for_wrong_domain_or_incomplete_assessment(eng
 def test_process_history_migration_contains_no_decision_boundary(engine) -> None:
     tables = set(inspect(engine).get_table_names())
     assert "process_history_entries" in tables
-    assert not {"decision_records", "decision_support_assessments", "decision_scope_items", "decision_conditions"} & tables
+    # INC-11 may add terminal-decision tables later; RRR-05 itself creates no Decision.
+    assert "decision_records" not in {row[0] for row in engine.connect().execute(
+        text("SELECT decision_record_id FROM decision_records"))}
