@@ -1,0 +1,43 @@
+scenario: B
+tables:
+  change_cases:
+    - change_case_id: CHG-B01
+      case_state: In Assessment
+      title: Cooling Plate material revision requiring applicability scope amendment
+  impact_executions:
+    - impact_execution_id: IAX-B01
+      execution_status: Completed
+      routing_status: Completed
+    - impact_execution_id: IAX-B02
+      execution_status: Completed
+      routing_status: Completed
+  process_history_entries:
+    - process_history_id: HIST-B01
+      entry_type: Scope Revision Required
+  decision_records: []
+  assessment_obligations:
+    - assessment_obligation_id: AO-B01
+      fulfilled_by_assessment_id: ASM-B01
+    - assessment_obligation_id: AO-B02
+      fulfilled_by_assessment_id: ASM-B02
+    - assessment_obligation_id: AO-B03
+      fulfilled_by_assessment_id: ASM-B03
+    - assessment_obligation_id: AO-B04
+      fulfilled_by_assessment_id: ASM-B04
+    - assessment_obligation_id: AO-B21
+      fulfilled_by_assessment_id: null
+    - assessment_obligation_id: AO-B22
+      fulfilled_by_assessment_id: null
+    - assessment_obligation_id: AO-B23
+      fulfilled_by_assessment_id: ASM-B02
+    - assessment_obligation_id: AO-B24
+      fulfilled_by_assessment_id: ASM-B04
+derived:
+  executions:
+    IAX-B02:
+      gate_b:
+        gate_b: Incomplete
+        required_authority_level: Not Evaluated
+      eligibility:
+        authorisation_eligibility: Not Evaluated
+  handover: null

@@ -1,0 +1,8 @@
+{
+  "Cross-scenario assertions": true,
+  "Historical reconstruction": true,
+  "Integrity suite": true,
+  "Scenario A oracle": true,
+  "Scenario B oracle": true,
+  "Scenario C oracle": true
+}

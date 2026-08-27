@@ -1,0 +1,30 @@
+scenario: C
+tables:
+  change_cases:
+    - change_case_id: CHG-C01
+      case_state: Decision Ready
+      title: Cooling Plate change requiring Elevated authority
+  impact_executions:
+    - impact_execution_id: IAX-C01
+      execution_status: Completed
+      routing_status: Completed
+  process_history_entries:
+    - process_history_id: HIST-C01
+      change_case_id: CHG-C01
+      entry_type: Escalated
+      actor: Decision Coordinator C
+      target_stage_or_route: Elevated Authority Route
+  decision_records: []
+derived:
+  executions:
+    IAX-C01:
+      gate_b:
+        gate_b: Complete
+        required_authority_level: Elevated
+      eligibility:
+        authorisation_eligibility: Permitted
+      authority:
+        current_authority_level: Standard
+        decision_permitted: false
+        escalation_required: true
+  handover: null

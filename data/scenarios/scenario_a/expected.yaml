@@ -1,0 +1,46 @@
+scenario: A
+tables:
+  change_cases:
+    - change_case_id: CHG-A01
+      case_state: Closed by Decision
+      title: Cooling Plate supplier-process material characteristic update
+      rationale: Update one Cooling Plate material characteristic while preserving intended function and current applicability.
+  change_item_revisions:
+    - change_item_id: CI-A01
+      change_item_revision: r1
+      change_case_id: CHG-A01
+      action: Revise Product State
+      target_type: Product Version
+      target_id: PV-003
+      reason: Synthetic supplier process change.
+  impact_executions:
+    - impact_execution_id: IAX-A01
+      change_case_id: CHG-A01
+      assessment_baseline_id: BL-A01
+      overlay_revision_id: OV-A01
+      execution_status: Completed
+      routing_status: Completed
+  decision_records:
+    - decision_record_id: DEC-A01
+      change_case_id: CHG-A01
+      outcome: Authorised for Downstream Processing
+  decision_conditions: []
+derived:
+  executions:
+    IAX-A01:
+      gate_b:
+        gate_b: Complete
+        required_authority_level: Standard
+      eligibility:
+        authorisation_eligibility: Permitted
+      authority:
+        authority_sufficient: true
+        decision_permitted: true
+  handover:
+    decision_record_id: DEC-A01
+    authorised_change_items: [CI-A01:r1]
+    proposed_product_state_action: Revise Product State
+    proposed_product_state_reference: OVOBJ-A01-PV
+    applicability_constraint: 'CoolingType = "Liquid"'
+    planned_engineering_effective_date: '2026-11-01'
+    decision_conditions: []

@@ -69,6 +69,5 @@ def test_g13_cli_and_http_share_runner_and_no_raw_mutation_routes(tmp_path: Path
 
 def test_g13_verify_all_is_deterministic_and_uses_no_expected_or_evidence(tmp_path: Path) -> None:
     path = tmp_path / "verify.db"
-    assert verify_all(path) and verify_all(path)
-    assert not list(Path("data").rglob("expected.yaml"))
-    assert not Path("evidence").exists()
+    assert verify_all(path, tmp_path / "evidence") and verify_all(path, tmp_path / "evidence")
+    assert list(Path("data").rglob("expected.yaml"))

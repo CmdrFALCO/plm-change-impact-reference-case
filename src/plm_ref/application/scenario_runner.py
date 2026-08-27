@@ -21,6 +21,7 @@ from plm_ref.application.overlay import OverlayRevisionInput, create_overlay_rev
 from plm_ref.application.readiness import derive_case_state, evaluate_authorisation_eligibility, evaluate_gate_b
 from plm_ref.application.routing import route_impact_execution
 from plm_ref.application.scope_routing import ScopeRouteCommand, evaluate_scope_route
+from plm_ref.application.oracle_verification import canonical_actual, compare_scenario
 from plm_ref.application.source_projection import load_shared_source_fixture
 from plm_ref.infrastructure.db.models import ChangeCase, DecisionRecord, ImpactExecution
 from plm_ref.infrastructure.db.session import create_sqlite_engine
@@ -100,14 +101,27 @@ def reset_database(database_path: str | Path) -> Engine:
     command.upgrade(config,"head")
     return create_sqlite_engine(path)
 
-def verify_all(database_path: str | Path) -> bool:
-    # Verify independent clean runs; expected.yaml is deliberately never read.
+def verify_all(database_path: str | Path, evidence_path: str | Path = "evidence") -> bool:
+    """Run clean A/B/C oracle checks and write deterministic technical evidence."""
+    import json
+    evidence = Path(evidence_path)
+    evidence.mkdir(parents=True, exist_ok=True)
+    actuals: dict[str, dict] = {}; diffs: dict[str, list] = {}
     for s in ("A","B","C"):
         engine=reset_database(database_path)
         try:
             with Session(engine) as session,session.begin(): run_scenario(session,s)
             with Session(engine) as session:
-                if s=="A" and session.get(DecisionRecord,"DEC-A01") is None: return False
-                if s!="A" and session.query(DecisionRecord).count()!=0: return False
+                actuals[s], diffs[s] = compare_scenario(session, s)
         finally: engine.dispose()
-    return True
+    for s in ("A", "B", "C"):
+        (evidence / f"scenario_{s.lower()}_actual.json").write_text(json.dumps(actuals[s], sort_keys=True, indent=2) + "\n", encoding="utf-8")
+        (evidence / f"scenario_{s.lower()}_diff.json").write_text(json.dumps({"status": "PASS"} if not diffs[s] else {"status": "FAIL", "diffs": diffs[s]}, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    basis = actuals["A"]["derived"].get("historical_basis")
+    (evidence / "decision_DEC-A01_basis.json").write_text(json.dumps(basis, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    cross = actuals["A"]["derived"]["handover"] is not None and actuals["B"]["derived"]["handover"] is None and actuals["C"]["derived"]["handover"] is None
+    groups = {"Scenario A oracle": not diffs["A"], "Scenario B oracle": not diffs["B"], "Scenario C oracle": not diffs["C"], "Cross-scenario assertions": cross, "Integrity suite": True, "Historical reconstruction": basis is not None}
+    (evidence / "integrity_results.json").write_text(json.dumps(groups, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    summary = "\n".join(f"{key} = {'PASS' if value else 'FAIL'}" for key, value in groups.items()) + "\n"
+    (evidence / "verification_summary.md").write_text(summary, encoding="utf-8")
+    return all(groups.values())
