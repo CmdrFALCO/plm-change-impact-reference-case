@@ -142,3 +142,18 @@ def derive_handover_view(session: Session, decision_record_id: str) -> HandoverV
         tuple(f"{item.fields['change_item_id']}:{item.fields['change_item_revision']}" for item in basis.scope_items),
         revisions[0].fields["action"], overlay_objects[0].record_id,
         payload.get("validated_configuration_scope"), revisions[0].fields["intended_effectivity"].get("planned_effective_date"), basis.decision_conditions)
+
+
+def derive_case_handover_view(session: Session, change_case_id: str) -> HandoverView | None:
+    """Return the authorised Handover for a case, or deterministic absence."""
+    decisions = tuple(session.scalars(select(DecisionRecord).where(
+        DecisionRecord.change_case_id == change_case_id,
+        DecisionRecord.outcome.in_((
+            "Authorised for Downstream Processing", "Authorised with Conditions",
+        )),
+    ).order_by(DecisionRecord.decision_record_id)))
+    if not decisions:
+        return None
+    if len(decisions) != 1:
+        raise HistoricalReconstructionError("Change Case has ambiguous authorised Decisions")
+    return derive_handover_view(session, decisions[0].decision_record_id)
