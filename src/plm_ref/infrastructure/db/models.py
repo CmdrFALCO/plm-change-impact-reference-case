@@ -685,3 +685,27 @@ class AssessmentReuseClassification(Base):
     )
     classification: Mapped[str] = mapped_column(String(32), nullable=False)
     rationale: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class ProcessHistoryEntry(Base):
+    __tablename__ = "process_history_entries"
+    __table_args__ = (
+        CheckConstraint(
+            "entry_type IN ('Returned for Information', 'Scope Revision Required', "
+            "'Additional Assessment Required', 'Escalated', 'Delegated', "
+            "'Change Item Removed from Proposal', 'Withdrawn by Change Owner')",
+            name="ck_process_history_entries_type",
+        ),
+        Index("ix_process_history_entries_change_case_id", "change_case_id"),
+    )
+
+    process_history_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    change_case_id: Mapped[str] = mapped_column(ForeignKey("change_cases.change_case_id"), nullable=False)
+    entry_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    actor: Mapped[str] = mapped_column(String(255), nullable=False)
+    origin_stage: Mapped[str] = mapped_column(String(128), nullable=False)
+    target_stage_or_route: Mapped[str] = mapped_column(String(128), nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    affected_change_item_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    affected_change_item_revision: Mapped[str | None] = mapped_column(String(32), nullable=True)

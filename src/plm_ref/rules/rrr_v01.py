@@ -62,6 +62,41 @@ class AssessmentObligationSpec:
     routing_rule_reference: Literal["RRR-01", "RRR-02", "RRR-03", "RRR-04"]
 
 
+@dataclass(frozen=True)
+class Rrr05Input:
+    validated_scope_relation: ApplicabilityRelation
+    product_engineering_assessment_complete: bool
+    assessment_linked_to_occurrence_candidate: bool
+    req_004_conclusion: str | None
+    overlay_contains_matching_applicability_change: bool
+
+
+@dataclass(frozen=True)
+class ScopeRevisionRequiredSpec:
+    affected_change_item_id: str | None
+    affected_change_item_revision: str | None
+
+
+def evaluate_rrr05(
+    inputs: Rrr05Input,
+    provenance_sources: frozenset[tuple[str, str]],
+) -> ScopeRevisionRequiredSpec | None:
+    """Return a persistence-free RRR-05 result from structured state only."""
+    if not (
+        inputs.validated_scope_relation == "Proposed Narrower"
+        and inputs.product_engineering_assessment_complete
+        and inputs.assessment_linked_to_occurrence_candidate
+        and inputs.req_004_conclusion == "Not Satisfied"
+        and not inputs.overlay_contains_matching_applicability_change
+    ):
+        return None
+    source = next(iter(provenance_sources)) if len(provenance_sources) == 1 else None
+    return ScopeRevisionRequiredSpec(
+        affected_change_item_id=source[0] if source else None,
+        affected_change_item_revision=source[1] if source else None,
+    )
+
+
 def parse_bounded_applicability(
     expression: str,
 ) -> frozenset[tuple[str, str]] | None:
