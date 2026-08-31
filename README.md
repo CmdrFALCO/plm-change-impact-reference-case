@@ -17,6 +17,16 @@ This repository shows how an engineering product-change problem can be transform
 
 The verified implementation commit is intentionally identified separately from later documentation-only commits.
 
+## Start with the architecture
+
+The architecture is the primary deliverable. The executable demonstrator is its verification boundary.
+
+- **15-minute orientation:** [Architecture Index](docs/00-architecture-index.md) → Business Architecture capability/process/scenarios/invariants → the frozen scenario summary below → verification summary.
+- **45-minute architecture review:** Architecture Index → Business Architecture → Logical Information Model invariants and integrity rules → `RRR-v0.1` evaluation order and scenario traces → Solution Architecture objectives and decisions.
+- **Deep technical review:** all six frozen artefacts in precedence order → scenario/impact fixtures → application and rule modules → `G00–G14` tests → committed evidence.
+
+The [Architecture Index](docs/00-architecture-index.md) records document status, precedence, SHA-256 values, public-safe boundaries and detailed reading paths.
+
 ## Why this reference case exists
 
 Product change is broader than replacing one object revision with another. A decision-ready change package must distinguish several different kinds of state and evidence that are often blurred together in implementation-centric solutions.
@@ -68,12 +78,12 @@ Key invariants include:
 
 Implementation follows this precedence order:
 
-1. **Business Architecture Definition v0.3.1 — Frozen Implementation Baseline**
-2. **Logical Information Model v0.3.2 — Frozen Implementation Baseline**
-3. **Scenario Data Definition v0.1**
-4. **Readiness and Routing Rules v0.1 — Frozen Implementation Baseline** (`RRR-v0.1`)
-5. **Solution Architecture v0.1 — Frozen Implementation Baseline**
-6. **Prototype Implementation Plan v0.1 — Frozen Implementation Baseline**
+1. [**Business Architecture Definition v0.3.1 — Frozen Implementation Baseline**](docs/01-business-architecture/Business_Architecture_Definition_v0.3.1_Frozen_Implementation_Baseline.md)
+2. [**Logical Information Model v0.3.2 — Frozen Implementation Baseline**](docs/02-logical-information-model/Product_Change_Impact_Decision_Readiness_Logical_Information_Model_v0.3.2_Frozen_Implementation_Baseline.md)
+3. [**Scenario Data Definition v0.1 — Frozen Implementation Baseline**](docs/03-scenario-data/Product_Change_Impact_Decision_Readiness_Scenario_Data_Definition_v0.1.md)
+4. [**Readiness and Routing Rules v0.1 — Frozen Implementation Baseline**](docs/04-readiness-routing-rules/Product_Change_Impact_Decision_Readiness_Readiness_and_Routing_Rules_v0.1_Frozen_Implementation_Baseline.md) (`RRR-v0.1`)
+5. [**Solution Architecture v0.1 — Frozen Implementation Baseline**](docs/05-solution-architecture/Product_Change_Impact_Decision_Readiness_Solution_Architecture_v0.1_Frozen_Implementation_Baseline.md)
+6. [**Prototype Implementation Plan v0.1 — Frozen Implementation Baseline**](docs/06-implementation-plan/Product_Change_Impact_Decision_Readiness_Prototype_Implementation_Plan_v0.1_Frozen_Implementation_Baseline.md)
 
 The software was required to conform to these semantics. Upstream meaning was not changed to simplify implementation.
 
@@ -193,6 +203,7 @@ plm-ref verify all
 
 ```text
 .
+├── docs/          # frozen architecture authority chain and publication index
 ├── data/          # frozen source, baseline, impact and expected scenario fixtures
 ├── evidence/      # deterministic verification evidence
 ├── migrations/    # Alembic schema and integrity migrations
