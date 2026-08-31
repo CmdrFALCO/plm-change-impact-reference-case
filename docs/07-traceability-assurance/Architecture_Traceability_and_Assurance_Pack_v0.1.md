@@ -2,11 +2,11 @@
 
 ## Architecture Traceability and Assurance Pack v0.1
 
-**Document type:** Documentation-only traceability and assurance map  
-**Status:** Release-candidate packaging artefact; does not redefine frozen semantics  
-**Repository:** `CmdrFALCO/plm-change-impact-reference-case`  
-**Release target:** `v0.1.0`  
-**Verified implementation baseline:** `7a5733fc7042e33a790db12278f8776d047eb4b6`  
+**Document type:** Documentation-only traceability and assurance map<br>
+**Status:** Release-candidate packaging artefact; does not redefine frozen semantics<br>
+**Repository:** `CmdrFALCO/plm-change-impact-reference-case`<br>
+**Release target:** `v0.1.0`<br>
+**Verified implementation baseline:** `7a5733fc7042e33a790db12278f8776d047eb4b6`<br>
 **Architecture-publication merge base:** `a1c3e1969dd75836b672f83684aa11feb4ee71df`
 
 ---
@@ -80,7 +80,7 @@ The executable demonstrator proves deterministic conformance to the frozen synth
 | **BR-01** | Distinguish Change Case from contained Change Items. | LIM Change Case; Change Item Identity / Revision. | [`change_case.py`](../../src/plm_ref/application/change_case.py), relational case/item model. | [`test_g02_change_case_gate_a.py`](../../tests/test_g02_change_case_gate_a.py); scenario A/B/C actual state. | A–C verified |
 | **BR-02** | Each Change Item states action and target. | LIM immutable Change Item Revision; action-specific target integrity. | [`change_case.py`](../../src/plm_ref/application/change_case.py), [`gate_a.py`](../../src/plm_ref/application/gate_a.py). | G02 target-identification tests; scenario fixtures. | A–C verified |
 | **BR-03** | Only `Revise Product State` and `Change Applicability` are executable. | LIM executable-action set; Gate A action rules. | Change-item validation and [`overlay.py`](../../src/plm_ref/application/overlay.py). | G02/G04 negative action and materialisation tests. | Integrity verified |
-| **BR-04** | Baselined / decision-lineage Product Versions are immutable. | LIM IR-08/09 plus Product Version immutability; SA dual enforcement. | [`baseline.py`](../../src/plm_ref/application/baseline.py), DB guards/triggers under [`migrations/`](../../migrations/) and [`infrastructure/db/`](../../src/plm_ref/infrastructure/db/). | [`test_g03_baseline.py`](../../tests/test_g03_baseline.py); IT-03/IT-04; integrity evidence. | Integrity verified |
+| **BR-04** | Baselined / decision-lineage Product Versions are immutable. | LIM-INV-04; IR-08/09 protect the used baseline and member snapshots; SA dual enforcement. | [`baseline.py`](../../src/plm_ref/application/baseline.py), DB guards/triggers under [`migrations/`](../../migrations/) and [`infrastructure/db/`](../../src/plm_ref/infrastructure/db/). | [`test_g03_baseline.py`](../../tests/test_g03_baseline.py); IT-03/IT-04. | Integrity verified |
 | **BR-05** | Revising baselined product state creates an overlay successor, never in-place mutation. | LIM Overlay-local Object; `Revise Product State`. | [`overlay.py`](../../src/plm_ref/application/overlay.py). | G03/G04; IT-05. | A–C + integrity verified |
 | **BR-06** | Product identity, state and usage stay separate. | Product Element / Product Version / Product Structure Occurrence. | Relational source and baseline models in [`infrastructure/db/`](../../src/plm_ref/infrastructure/db/). | [`test_g01_source_projection.py`](../../tests/test_g01_source_projection.py); G03/G04. | Structural / bounded |
 | **BR-07** | Applicability and effectivity are separate. | LIM separate bounded value semantics. | Source, payload and overlay validation; [`overlay.py`](../../src/plm_ref/application/overlay.py). | G01/G04; scenario baseline and overlay fixtures. | A–C verified |
@@ -88,10 +88,10 @@ The executable demonstrator proves deterministic conformance to the frozen synth
 | **BR-09** | Proposal revision requires a new overlay and execution. | LIM proposal-change invariant; Scenario B second cycle. | [`scenario_runner.py`](../../src/plm_ref/application/scenario_runner.py), [`overlay.py`](../../src/plm_ref/application/overlay.py), [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py). | G08/G09/G14; Scenario B actual/diff. | A–C verified |
 | **BR-10** | Proposal revision does not automatically require a new baseline. | Baseline-reuse predicate; Scenario B reuses `BL-B01`. | [`baseline.py`](../../src/plm_ref/application/baseline.py). | G03/G08/G14; Scenario B actual. | A–C verified |
 | **BR-11** | Impact analysis evaluates current and proposed state. | Baseline + overlay invariant; bounded execution lineage. | [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py) with bounded frozen-fixture impact port. | G05 and scenario oracle comparison. | Scenario-bounded; general graph discovery not claimed |
-| **BR-12** | Impact Candidates trace to source Change Items, baseline and execution. | LIM structured provenance IR-17–IR-21. | [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py), normalized provenance persistence. | G05; IT-16 candidate-provenance injection; scenario actual files. | A–C + integrity verified |
+| **BR-12** | Impact Candidates trace to source Change Items, baseline and execution. | LIM structured provenance IR-15–IR-21. | [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py), normalized provenance persistence. | G05; IT-16 candidate-provenance injection; scenario actual files. | A–C + integrity verified |
 | **BR-13** | Discovery does not automatically alter Proposed Change Scope or Decision Scope. | LIM impact-vs-scope invariant; RRR-05 route only. | [`scope_routing.py`](../../src/plm_ref/application/scope_routing.py), [`decision.py`](../../src/plm_ref/application/decision.py). | G08 IT-10; G11 scope validation; Scenario B. | A–C verified |
 | **BR-14** | Scope change requires explicit Change Item creation/revision. | RRR-05 explicitly does not create `CI-B02:r1`. | [`scope_routing.py`](../../src/plm_ref/application/scope_routing.py), [`change_case.py`](../../src/plm_ref/application/change_case.py). | [`test_g08_scope_route.py`](../../tests/test_g08_scope_route.py); IT-10. | A–C verified |
-| **BR-15** | Required Assessments come from declared routing logic; overrides require explicit rationale. | `RRR-01..04`; Assessment Obligations. | [`routing.py`](../../src/plm_ref/application/routing.py), [`rules/rrr_v01.py`](../../src/plm_ref/rules/rrr_v01.py). | [`test_g06_routing.py`](../../tests/test_g06_routing.py); scenario obligations. | Deterministic routing A–C verified; general enterprise override model not claimed |
+| **BR-15** | Required Assessments come from declared routing logic and documented Process Authority overrides. | `RRR-01..04`; Assessment Obligations. | [`routing.py`](../../src/plm_ref/application/routing.py), [`rules/rrr_v01.py`](../../src/plm_ref/rules/rrr_v01.py). No Process Authority override command or record is implemented. | [`test_g06_routing.py`](../../tests/test_g06_routing.py); scenario obligations. | Deterministic routing A–C verified; Process Authority override path not demonstrated |
 | **BR-16** | Assessment state, relevance and disposition remain independent. | LIM Assessment fields and allowed values. | [`assessment.py`](../../src/plm_ref/application/assessment.py), persistence model. | [`test_g07_assessment.py`](../../tests/test_g07_assessment.py); scenario Assessment records. | A–C verified |
 | **BR-17** | Only Assessment records Requirement conclusions. | LIM IR-26; Evidence-is-not-compliance invariant. | [`assessment.py`](../../src/plm_ref/application/assessment.py). | G07; scenario Requirement Conclusions. | A–C verified |
 | **BR-18** | Evidence identifies applicable Product Version and Configuration Context. | LIM Evidence Record + Assessment Evidence Use. | Source/evidence persistence and [`assessment.py`](../../src/plm_ref/application/assessment.py). | G01/G07; immutable Evidence snapshots in scenario actual and decision basis. | A–C verified |
@@ -101,7 +101,7 @@ The executable demonstrator proves deterministic conformance to the frozen synth
 | **BR-22** | Decision Conditions exist only inside authorised terminal Decision. | LIM Decision Condition cardinality; IR-46–IR-48. | [`decision.py`](../../src/plm_ref/application/decision.py). | [`test_g11_terminal_decision.py`](../../tests/test_g11_terminal_decision.py). | Integrity verified; Scenario A uses zero conditions |
 | **BR-23** | Insufficient authority creates escalation, not Decision Record. | RRR-06; `Standard < Elevated`; IR-39/40. | [`authority.py`](../../src/plm_ref/application/authority.py). | G10 IT-12; Scenario C actual/diff. | A–C verified |
 | **BR-24** | Only terminal authority dispositions create Decision Records. | LIM Decision vs routing; RRR terminal persistence preconditions. | [`decision.py`](../../src/plm_ref/application/decision.py), process history services. | G08/G10/G11; IT-13; Scenario B/C contain no Decision. | A–C verified |
-| **BR-25** | Withdrawal is administrative closure, not Decision Record. | LIM IR-49; BA withdrawal boundary. | Change-case/history/interface support. | Structural/API coverage; withdrawal is not one of frozen A–C stop points. | Structural / bounded |
+| **BR-25** | Withdrawal is administrative closure, not Decision Record. | LIM-INV-22; IR-49; BA withdrawal boundary. | The relational schema permits `Withdrawn` Case state and `Withdrawn by Change Owner` Process-history type; no withdrawal application command is implemented. | Schema inspection only; withdrawal is not a frozen A–C stop point and has no acceptance/integrity test. | Represented only; executable behaviour not demonstrated |
 | **BR-26** | Every Decision disposes explicit Change Item IDs/revisions. | LIM Decision Scope Items; IR-41/42. | [`decision.py`](../../src/plm_ref/application/decision.py). | G11; `DEC-A01` Decision Scope in scenario A and decision-basis evidence. | A–C verified |
 | **BR-27** | Decision references final baseline, overlay and execution. | LIM Decision lineage; IR-43/45. | [`decision.py`](../../src/plm_ref/application/decision.py), [`history_and_views.py`](../../src/plm_ref/application/history_and_views.py). | G11/G12; [`decision_DEC-A01_basis.json`](../../evidence/decision_DEC-A01_basis.json). | A–C verified |
 | **BR-28** | Authorised Decision supports derived downstream Handover View. | LIM derived Handover View; SA no persisted handover object. | [`history_and_views.py`](../../src/plm_ref/application/history_and_views.py). | [`test_g12_history_and_handover.py`](../../tests/test_g12_history_and_handover.py); Scenario A only. | A–C verified |
@@ -112,8 +112,8 @@ The executable demonstrator proves deterministic conformance to the frozen synth
 The table does not claim that every generic capability implied by a Business Requirement is implemented beyond the frozen scenarios. In particular:
 
 - impact discovery is supplied by the bounded `ImpactAnalysisPort` fixture adapter rather than a general PLM graph engine;
-- Process Authority override semantics are not expanded into an enterprise approval/governance hierarchy;
-- withdrawal is architecturally represented but is not a Scenario A–C terminal outcome;
+- BR-15 Process Authority override semantics have no implemented command, persisted override record or acceptance test; only deterministic `RRR-01..04` routing is demonstrated;
+- BR-25 withdrawal is represented only by allowed schema values; no withdrawal application use case or executable Scenario A–C outcome is demonstrated;
 - the scenario oracles prove the defined synthetic states, not real product engineering correctness.
 
 ---
@@ -136,16 +136,16 @@ The table does not claim that every generic capability implied by a Business Req
 
 ## 4.1 Key Logical Information Model assurance invariants
 
-The implementation also directly reflects the following LIM invariants because they are essential to deterministic execution:
+The implementation directly reflects or structurally represents the following LIM invariants because they are essential to deterministic execution:
 
 - **LIM-INV-03 / 14:** baseline and Evidence state are historically reconstructible;
 - **LIM-INV-07 / 08:** Change Item identity/revision and proposal lifecycle are separate;
 - **LIM-INV-09 / 10:** overlay membership and overlay-local identity are explicit and immutable;
-- **LIM-INV-12:** Impact Candidate provenance is structured and many-to-many capable;
+- **LIM-INV-12:** Impact Candidate provenance is relationally structured and permits multiple provenance records and paths; the frozen scenario oracles use one provenance record per candidate;
 - **LIM-INV-15 / 17:** completed supporting Assessments lock; reuse is execution-relative;
 - **LIM-INV-18 / 19:** Gate B is obligation-driven and separate from Authorisation Eligibility;
 - **LIM-INV-21 / 23:** routing is not Decision; Decision lineage is explicit;
-- **LIM-INV-24:** all case-bound lineage resolves to one Change Case.
+- **LIM-INV-24:** the six release-critical IT-16 lineage families are actively rejected cross-case, with additional bounded cross-case guards in earlier gates; this pack does not claim an exhaustive proof of every possible association named by the invariant.
 
 The LIM's **IR-01–IR-51** remain the authoritative integrity catalogue. The implementation uses relational constraints, application validation, immutable snapshots and database triggers to enforce the subset required by the bounded scenarios and release-critical negative tests.
 
@@ -184,7 +184,7 @@ Rule assurance boundaries:
 | **G06** | `RRR-01..04` routing | [`test_g06_routing.py`](../../tests/test_g06_routing.py) | Exact obligations, null-candidate obligations, routing atomicity. |
 | **G07** | Assessment / Evidence Use / lock | [`test_g07_assessment.py`](../../tests/test_g07_assessment.py) | Requirement Conclusions, Evidence transferability, complete Assessment lock boundary. |
 | **G08** | Scope route / explicit Scenario B amendment | [`test_g08_scope_route.py`](../../tests/test_g08_scope_route.py) | `RRR-05`, `HIST-B01`, no automatic Change Item, baseline reuse route. |
-| **G09** | Assessment reuse / retained fulfilment | [`test_g09_assessment_reuse.py`](../../tests/test_g09_assessment_reuse.py) | I/R/RV/R classification, retained fulfilment without historical mutation. |
+| **G09** | Assessment reuse / retained fulfilment | [`test_g09_assessment_reuse.py`](../../tests/test_g09_assessment_reuse.py) | Exact Invalidated / Revalidation Required / Retained classification and retained fulfilment without historical mutation. |
 | **G10** | Gate B / Eligibility / authority | [`test_g10_readiness_authority.py`](../../tests/test_g10_readiness_authority.py) | Completeness vs substantive eligibility vs authority; Scenario C escalation. |
 | **G11** | Terminal Decision / case closure | [`test_g11_terminal_decision.py`](../../tests/test_g11_terminal_decision.py) | Explicit authority command, complete support/scope validation, `DEC-A01`. |
 | **G12** | Historical reconstruction / Handover | [`test_g12_history_and_handover.py`](../../tests/test_g12_history_and_handover.py) | Reconstruct immutable Decision basis; derive Handover rather than persist it. |
@@ -269,7 +269,8 @@ The release must not claim:
 - AI/LLM runtime capability;
 - production-scale concurrency, distributed architecture, enterprise authentication/RBAC or cloud deployment;
 - proof that a real engineering product change is technically correct or safe;
-- proof that the frozen synthetic routing rules are appropriate enterprise rules.
+- proof that the frozen synthetic routing rules are appropriate enterprise rules;
+- an implemented Process Authority override workflow or executable Change Owner withdrawal use case.
 
 ## 9.3 Prototype-specific implementation limitations
 
@@ -288,7 +289,7 @@ The following are deliberate implementation choices rather than architecture def
 
 ## 10.1 Fifteen-minute assurance review
 
-1. Read [`../00-architecture-index.md`](../00-architecture-index.md) through the authority chain and scenario summary.
+1. Read the [architecture index](../00-architecture-index.md) through the authority chain and scenario summary.
 2. Read §9 of this pack: public claims and limitations.
 3. Inspect the three scenario diff files and [`verification_summary.md`](../../evidence/verification_summary.md).
 4. Inspect [`integrity_results.json`](../../evidence/integrity_results.json) for active IT-16 rejection evidence.
@@ -346,14 +347,14 @@ The authoritative decisions remain Section 35 of the frozen Solution Architectur
 |---|---|---|---|
 | **SA-DEC-01** | Modular monolith. | Keeps cross-module integrity and transactions inspectable without distributed-system noise. | [`src/plm_ref/`](../../src/plm_ref/) |
 | **SA-DEC-02** | Relational persistence with SQLite + SQLAlchemy. | Lineage-heavy bounded model maps directly to enforceable FK/uniqueness/transaction controls. | [`infrastructure/db/`](../../src/plm_ref/infrastructure/db/), [`migrations/`](../../migrations/) |
-| **SA-DEC-03** | Relational entities + validated JSON for bounded snapshots/value objects. | Preserves historical snapshot fidelity without inventing new domain entities. | DB models + validated payloads. |
+| **SA-DEC-03** | Relational entities + validated JSON for bounded snapshots/value objects. | Preserves historical snapshot fidelity without inventing new domain entities. | [`models.py`](../../src/plm_ref/infrastructure/db/models.py) plus validated application/fixture payloads. |
 | **SA-DEC-04** | Explicit deterministic Python rules. | Critical routing/readiness logic remains visible, testable and version-bound. | [`rules/`](../../src/plm_ref/rules/), [`routing.py`](../../src/plm_ref/application/routing.py) |
-| **SA-DEC-05** | Bounded impact-analysis port with frozen fixture adapter. | Avoids falsely claiming a general impact-discovery algorithm while proving downstream architecture. | [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py), impact infrastructure/fixtures. |
+| **SA-DEC-05** | Bounded impact-analysis port with frozen fixture adapter. | Avoids falsely claiming a general impact-discovery algorithm while proving downstream architecture. | [`impact_analysis.py`](../../src/plm_ref/application/impact_analysis.py), [`port.py`](../../src/plm_ref/infrastructure/impact/port.py), [`frozen_fixture_adapter.py`](../../src/plm_ref/infrastructure/impact/frozen_fixture_adapter.py). |
 | **SA-DEC-06** | No automated terminal Decision. | Rules determine permission; explicit authority action supplies the outcome. | [`decision.py`](../../src/plm_ref/application/decision.py), G11/IT-13. |
 | **SA-DEC-07** | Dual immutability enforcement. | Release-critical historical state is protected both by application logic and SQLite triggers. | baseline/assessment/decision services + migrations. |
 | **SA-DEC-08** | Handover is derived, not persisted. | Prevents an unnecessary competing lifecycle object and preserves frozen semantics. | [`history_and_views.py`](../../src/plm_ref/application/history_and_views.py), G12. |
 | **SA-DEC-09** | Gate/readiness values are derived projections, not generic persisted business objects. | Keeps completeness/eligibility/authority calculations distinct from auditable business records. | [`readiness.py`](../../src/plm_ref/application/readiness.py), [`authority.py`](../../src/plm_ref/application/authority.py). |
-| **SA-DEC-10** | Rule-set version binding. | Historical rule meaning cannot silently drift when later rules evolve. | `RRR-v0.1` stored on executions; rule implementation/registry. |
+| **SA-DEC-10** | Rule-set version binding. | Historical rule meaning cannot silently drift when later rules evolve. | `RRR-v0.1` stored on executions; registry dispatch in [`routing.py`](../../src/plm_ref/application/routing.py) and [`rrr_v01.py`](../../src/plm_ref/rules/rrr_v01.py). |
 
 ---
 
