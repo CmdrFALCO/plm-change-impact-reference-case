@@ -2,7 +2,7 @@
 
 ## Session 6 — Demonstration & Interview Package
 
-**Status:** Session 6 complete — five-minute deterministic demo, static evidence extracts, 15-minute architecture/interview walkthrough, 30-minute technical-review walkthrough, 60-second explanation and 3-minute explanation  
+**Status:** Session 6 complete and merged — five-minute deterministic demo, static evidence extracts, 15-minute architecture/interview walkthrough, 30-minute technical-review walkthrough, 60-second explanation and 3-minute explanation  
 **Release target:** `v0.1.0`  
 **Authority:** Derived communication material only; subordinate to the frozen architecture, code, tests and committed evidence
 
@@ -94,7 +94,7 @@ VERIFIED_BASELINE.md
 
 ## Session 6 completion rule
 
-The same architecture-first story is now available at four depths:
+The same architecture-first story is now available at five depths:
 
 ```text
 ~60 seconds
@@ -106,4 +106,4 @@ The same architecture-first story is now available at four depths:
 
 The Session 5 ten-slide presentation remains canonical at every depth. Session 6 adds only scripts, static evidence views and controlled review paths; it does not create a competing deck or source of truth.
 
-Do not begin Session 7 independent review or Session 8 release/archive work from this package until the Session 6 branch has passed the repository verification workflow and been accepted through the protected pull-request path.
+Session 6 was accepted through protected PR #5 and passed the required verification workflow before merge and again on the post-merge `main` run. The next planned phase is Session 7 — independent review and correction. Session 8 release/archive work remains deferred until Session 7 is complete.
