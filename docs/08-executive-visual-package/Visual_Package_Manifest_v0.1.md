@@ -2,7 +2,7 @@
 
 ## Visual Package Manifest v0.1
 
-**Status:** Session 5 package prepared for visual review  
+**Status:** Session 5 canonical package — visually approved final release candidate
 **Package type:** Public-safe, role-neutral executive and visual package  
 **Release target:** `v0.1.0`  
 **Architecture authority:** Unchanged; all package files are derived communication artefacts
@@ -11,7 +11,7 @@
 
 # 1. Package boundary
 
-This manifest records the semantic sources and generated review artefacts of Session 5.
+This manifest records the semantic sources and final human-approved visual artefacts of Session 5.
 
 The package preserves two visible dimensions of the same reference case:
 
@@ -40,12 +40,12 @@ Exactly three diagrams are designated as canonical.
 
 # 3. Generated editable visual artefacts
 
-The following files have been generated and locally validated. At the manifest commit they are review outputs awaiting final approval and repository binary addition.
+The following human-approved files incorporate the final cosmetic corrections and have been locally validated. Their addition is documentation-only: no frozen architecture or executable semantics are changed.
 
 | File | Purpose | SHA-256 | Bytes |
 |---|---|---|---:|
-| `Executive_Brief_v0.1.pptx` | Editable A4 portrait one-page executive brief source. | `8e83efc080a62d3e7eb4887e7655c716996b2ac75b106a51441df0313bbc1e8d` | 75,235 |
-| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pptx` | Editable 16:9 canonical ten-slide presentation with native text, shapes and connectors plus speaker notes. | `3c6f56ad2b42f7a5fa0827db2925d85a189a258b44e0369171b55aacfe74c19e` | 461,779 |
+| `Executive_Brief_v0.1.pptx` | Editable A4 portrait one-page executive brief source. | `60d8237fd50de251fda27c1308fcb337db38344f6f35a01040fcafab791ec2a0` | 18,948 |
+| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pptx` | Editable 16:9 canonical ten-slide presentation with native text, shapes and connectors. | `695ad6a6c9197b9f7bc0a74be99dfa91cf3c3fd5524d4543f65906cdff381827` | 57,485 |
 | `diagrams/01_architecture_to_evidence_chain.svg` | Editable vector derivative of Canonical Diagram 1. | `3c2886d637a6c688d5358410eddd61b1158382014a1fe9f2dfa3c4293d35ee10` | 10,129 |
 | `diagrams/02_baseline_overlay_state_separation.svg` | Editable vector derivative of Canonical Diagram 2. | `b8b5eded6887fb984ec1505f157860ea7cda9f46514cb3a3b899679263470aa8` | 6,106 |
 | `diagrams/03_readiness_eligibility_authority_decision.svg` | Editable vector derivative of Canonical Diagram 3. | `ed99e96e655b83626a37d82bc8423ed64ae2888963428a1a36824f1a70480dbb` | 6,779 |
@@ -58,8 +58,8 @@ The PowerPoint source uses editable native slide objects. The SVG files are addi
 
 | File | Purpose | SHA-256 | Bytes |
 |---|---|---|---:|
-| `Executive_Brief_v0.1.pdf` | One-page A4 viewing/distribution derivative. | `76b3620dbe8d435e11a469f7c09c68e92534fd2bace7e91958bff6c7a8064f84` | 46,676 |
-| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pdf` | Ten-page viewing/distribution derivative of the canonical presentation. | `2209051c35891dcbf2bb84cef011467795293ad896f7526cf1db060bbfc4c543` | 242,382 |
+| `Executive_Brief_v0.1.pdf` | One-page A4 viewing/distribution derivative. | `2da1fc8cecfa3587cf25218383c025cd03b2766a164d713546c4ea1f538e0716` | 291,094 |
+| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pdf` | Ten-page viewing/distribution derivative of the canonical presentation. | `153c0dbcdffad6a8531c955006fdd578df7f106ad6e69057c684eb4d534245f4` | 541,021 |
 | `diagrams/01_architecture_to_evidence_chain.png` | Raster viewing derivative of Canonical Diagram 1. | `6d328e20bc448d8fc036048a0a6280f31a34a65036a558598a1d7879913d8f47` | 198,217 |
 | `diagrams/02_baseline_overlay_state_separation.png` | Raster viewing derivative of Canonical Diagram 2. | `c3ca4b092a8adfb8d20c8315cde65eeabf9e2bdfda6d51c32249c9195b556b24` | 165,516 |
 | `diagrams/03_readiness_eligibility_authority_decision.png` | Raster viewing derivative of Canonical Diagram 3. | `cfcfa04221bc7b43a489101930a7029500dab975d7939b31e109dc4a1d7cd8e1` | 147,353 |
@@ -91,9 +91,9 @@ The following packaging checks were completed before this manifest was finalised
 
 - the ten-slide PowerPoint passed automated slide overflow testing;
 - the A4 executive-brief PowerPoint passed automated slide overflow testing;
-- the presentation rendered successfully to ten slide images through LibreOffice;
-- the executive brief rendered successfully to one A4 page;
-- both PowerPoint files converted successfully to PDF;
+- the final presentation opened read-only in Microsoft PowerPoint and rendered successfully to ten slide images;
+- the final executive brief opened read-only in Microsoft PowerPoint and rendered successfully to one A4 page;
+- both final PowerPoint files passed OOXML package, relationship and slide-count validation;
 - the one-page PDF and the ten-page presentation PDF rendered successfully for visual inspection;
 - the three SVG files rendered successfully to PNG;
 - the three canonical slide diagrams were checked for terminology, arrow meaning and frozen scenario consistency;
@@ -113,4 +113,4 @@ The package supports a bounded conformance claim for the synthetic reference cas
 - automated engineering judgement or terminal approval;
 - enterprise programme, budget, workforce-capacity or organisational authority.
 
-The generated visual binaries should be added to the repository only after the visual-review checkpoint, then the branch should proceed through a protected pull request and the required `verify` status check.
+The generated visual binaries have passed the visual-review checkpoint. The final release-candidate package proceeds through a protected pull request and the required `verify` status check before merge.

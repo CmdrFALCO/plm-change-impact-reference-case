@@ -362,7 +362,7 @@ Before polished visual production begins, confirm:
 - [x] exactly three canonical diagrams are defined;
 - [x] later reuse depends on modularity, not competing decks;
 - [x] unsupported authority and company-fidelity claims are excluded;
-- [ ] all three editable diagram sources are reviewed against the frozen terminology;
-- [ ] the PowerPoint source and derived exports are produced;
-- [ ] the rendered one-page executive brief is checked for actual page fit;
-- [ ] the rendered presentation is checked slide by slide for legibility and semantic accuracy.
+- [x] all three editable diagram sources are reviewed against the frozen terminology;
+- [x] the PowerPoint source and derived exports are produced;
+- [x] the rendered one-page executive brief is checked for actual page fit;
+- [x] the rendered presentation is checked slide by slide for legibility and semantic accuracy.

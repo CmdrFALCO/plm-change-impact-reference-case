@@ -31,6 +31,8 @@ The [Architecture Index](docs/00-architecture-index.md) records document status,
 The [Architecture Traceability and Assurance Pack](docs/07-traceability-assurance/Architecture_Traceability_and_Assurance_Pack_v0.1.md)
 maps the frozen business requirements, invariants, rules, gates and integrity tests to implementation
 controls and committed evidence without redefining them.
+The [Executive Brief](docs/08-executive-visual-package/Executive_Brief_v0.1.md) provides a concise
+architecture-first entry point to the final visual package.
 
 ## Why this reference case exists
 
