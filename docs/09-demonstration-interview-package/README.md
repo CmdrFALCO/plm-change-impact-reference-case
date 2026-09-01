@@ -2,7 +2,7 @@
 
 ## Session 6 — Demonstration & Interview Package
 
-**Status:** Milestone 1 — five-minute deterministic demo and static evidence extracts  
+**Status:** Milestones 1–2 complete — five-minute deterministic demo, static evidence extracts and 15-minute architecture/interview walkthrough  
 **Release target:** `v0.1.0`  
 **Authority:** Derived communication material only; subordinate to the frozen architecture, code, tests and committed evidence
 
@@ -45,14 +45,22 @@ The Session 5 canonical package remains the visual source:
 
 Do not use this package to add PLM functionality, change Scenario A–C outcomes, imply automated engineering judgement, claim company-specific process fidelity, claim general arbitrary-graph impact discovery or present the Python/FastAPI/SQLite implementation as the main story.
 
-## Milestone 1 contents
+## Completed Session 6 material
 
-- [`Five_Minute_Deterministic_Demo_v0.1.md`](Five_Minute_Deterministic_Demo_v0.1.md) — exact architecture-first five-minute path.
+### Milestone 1 — five-minute deterministic demo and evidence views
+
+- [`Five_Minute_Deterministic_Demo_v0.1.md`](Five_Minute_Deterministic_Demo_v0.1.md) — exact architecture-first five-minute live/static path.
 - [`evidence-extracts/01_scenario_a_terminal_basis.md`](evidence-extracts/01_scenario_a_terminal_basis.md) — authorised terminal Decision basis.
 - [`evidence-extracts/02_scenario_b_scope_amendment.md`](evidence-extracts/02_scenario_b_scope_amendment.md) — explicit scope-revision loop and baseline reuse.
 - [`evidence-extracts/03_scenario_b_reuse_and_readiness.md`](evidence-extracts/03_scenario_b_reuse_and_readiness.md) — execution-relative Assessment reuse and remaining obligations.
 - [`evidence-extracts/04_scenario_c_authority_escalation.md`](evidence-extracts/04_scenario_c_authority_escalation.md) — complete package with insufficient authority and no Decision.
 - [`evidence-extracts/05_verification_evidence.md`](evidence-extracts/05_verification_evidence.md) — verification groups, regression boundary and IT-16 injection results.
+
+### Milestone 2 — 15-minute architecture/interview walkthrough
+
+- [`Fifteen_Minute_Architecture_Walkthrough_v0.1.md`](Fifteen_Minute_Architecture_Walkthrough_v0.1.md) — canonical ten-slide walkthrough with exact timing, evidence inserts, interview cut points and claim discipline.
+
+The 15-minute standard path is static-first. Live execution remains available through the separate five-minute demo when explicitly useful. This prevents the implementation interface from displacing the architecture narrative.
 
 ## Evidence-extract rule
 
@@ -72,13 +80,12 @@ evidence/verification_summary.md
 VERIFIED_BASELINE.md
 ```
 
-## Next Session 6 milestone
+## Remaining Session 6 material
 
-After this five-minute path and evidence selection are accepted, derive from the same material:
+Derive next from the same canonical presentation and accepted evidence set:
 
-1. 15-minute architecture/interview walkthrough;
-2. 30-minute technical-review walkthrough;
-3. 60-second verbal explanation;
-4. 3-minute verbal explanation.
+1. 30-minute technical-review walkthrough;
+2. 60-second verbal explanation;
+3. 3-minute verbal explanation.
 
 No second canonical deck is required. The Session 5 presentation remains canonical; Session 6 progressively reveals additional evidence depth around it.
