@@ -15,7 +15,7 @@ This is not a third presentation and not a code tour.
 
 Use the same architecture-first spine as the 15-minute walkthrough, then add technical depth only where it explains how a frozen architectural statement is represented, enforced or verified.
 
-The default path is **repository-inspection + static evidence**, with optional live execution only if the reviewer specifically asks for it. The purpose is to make the conformance chain inspectable:
+The default path is **repository inspection + static evidence**, with optional live execution only if the reviewer specifically asks for it. The purpose is to make the conformance chain inspectable:
 
 ```text
 business meaning
@@ -149,8 +149,8 @@ If the reviewer asks how this is enforced, open the relevant modules/tests rathe
 
 - `src/plm_ref/application/baseline.py`
 - `src/plm_ref/application/overlay.py`
-- `tests/test_g03_baseline_immutability.py` or the corresponding G03 tests in the repository
-- `tests/test_g04_overlay.py` or the corresponding G04 tests
+- `tests/test_g03_baseline.py`
+- `tests/test_g04_overlay.py`
 
 The important controls are:
 
