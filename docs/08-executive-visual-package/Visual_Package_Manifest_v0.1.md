@@ -44,11 +44,11 @@ The following files have been generated and locally validated. At the manifest c
 
 | File | Purpose | SHA-256 | Bytes |
 |---|---|---|---:|
-| `Executive_Brief_v0.1.pptx` | Editable A4 portrait one-page executive brief source. | `719a971e44ad36f26203bdd77585eecc587874f8241dc441fd980cac3f9adfcc` | 75,235 |
-| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pptx` | Editable 16:9 canonical ten-slide presentation with native text, shapes and connectors plus speaker notes. | `aba9b6f43370771622e2bf8ae336014bee58a5612220c87635f648452fabfd99` | 460,873 |
+| `Executive_Brief_v0.1.pptx` | Editable A4 portrait one-page executive brief source. | `8e83efc080a62d3e7eb4887e7655c716996b2ac75b106a51441df0313bbc1e8d` | 75,235 |
+| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pptx` | Editable 16:9 canonical ten-slide presentation with native text, shapes and connectors plus speaker notes. | `3c6f56ad2b42f7a5fa0827db2925d85a189a258b44e0369171b55aacfe74c19e` | 461,779 |
 | `diagrams/01_architecture_to_evidence_chain.svg` | Editable vector derivative of Canonical Diagram 1. | `3c2886d637a6c688d5358410eddd61b1158382014a1fe9f2dfa3c4293d35ee10` | 10,129 |
 | `diagrams/02_baseline_overlay_state_separation.svg` | Editable vector derivative of Canonical Diagram 2. | `b8b5eded6887fb984ec1505f157860ea7cda9f46514cb3a3b899679263470aa8` | 6,106 |
-| `diagrams/03_readiness_eligibility_authority_decision.svg` | Editable vector derivative of Canonical Diagram 3. | `d64f646abeb708729ab2c785040752439c54620792cdf256b759402672faa683` | 6,412 |
+| `diagrams/03_readiness_eligibility_authority_decision.svg` | Editable vector derivative of Canonical Diagram 3. | `ed99e96e655b83626a37d82bc8423ed64ae2888963428a1a36824f1a70480dbb` | 6,779 |
 
 The PowerPoint source uses editable native slide objects. The SVG files are additional vector derivatives; the Markdown/Mermaid files remain the transparent semantic diagram sources.
 
@@ -58,11 +58,11 @@ The PowerPoint source uses editable native slide objects. The SVG files are addi
 
 | File | Purpose | SHA-256 | Bytes |
 |---|---|---|---:|
-| `Executive_Brief_v0.1.pdf` | One-page A4 viewing/distribution derivative. | `fae6a37e5d49422e07a286bc1cd0ea3db48e9f185bbc3986ad9f94054bcfc060` | 46,676 |
-| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pdf` | Ten-page viewing/distribution derivative of the canonical presentation. | `08a9aa26c5c4833b6275997794cbdb40306d013a146f3ee7fc411db7a6ee367e` | 242,080 |
-| `diagrams/01_architecture_to_evidence_chain.png` | Raster viewing derivative of Canonical Diagram 1. | `d665a0e43bf22bdb23647b02390dcfb39cce9feb516aead264f7a33089e945d0` | 276,904 |
-| `diagrams/02_baseline_overlay_state_separation.png` | Raster viewing derivative of Canonical Diagram 2. | `398115f1ba8253958e9cef08ad2e7a9be6f68498b8088e13a2cc639f4d3ad38a` | 231,210 |
-| `diagrams/03_readiness_eligibility_authority_decision.png` | Raster viewing derivative of Canonical Diagram 3. | `e4f2674e54f522aa78e3043796a72c40235abb0b603e4b5cf9eb912aef1c6c55` | 200,495 |
+| `Executive_Brief_v0.1.pdf` | One-page A4 viewing/distribution derivative. | `76b3620dbe8d435e11a469f7c09c68e92534fd2bace7e91958bff6c7a8064f84` | 46,676 |
+| `Product_Change_Impact_Decision_Readiness_Presentation_v0.1.pdf` | Ten-page viewing/distribution derivative of the canonical presentation. | `2209051c35891dcbf2bb84cef011467795293ad896f7526cf1db060bbfc4c543` | 242,382 |
+| `diagrams/01_architecture_to_evidence_chain.png` | Raster viewing derivative of Canonical Diagram 1. | `6d328e20bc448d8fc036048a0a6280f31a34a65036a558598a1d7879913d8f47` | 198,217 |
+| `diagrams/02_baseline_overlay_state_separation.png` | Raster viewing derivative of Canonical Diagram 2. | `c3ca4b092a8adfb8d20c8315cde65eeabf9e2bdfda6d51c32249c9195b556b24` | 165,516 |
+| `diagrams/03_readiness_eligibility_authority_decision.png` | Raster viewing derivative of Canonical Diagram 3. | `cfcfa04221bc7b43a489101930a7029500dab975d7939b31e109dc4a1d7cd8e1` | 147,353 |
 
 ---
 
