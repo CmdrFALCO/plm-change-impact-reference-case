@@ -2,16 +2,23 @@
 
 ## Release state
 
-The repository is an **unreleased `0.1.0` release candidate**.
+The repository has a published **`v0.1.0` release dated 2026-09-01**.
 
-The verified executable baseline is:
+Published release facts:
+
+- annotated tag: `v0.1.0`;
+- release commit: `f15c75b237f85d0926ab0531962e4aba15568fab`;
+- GitHub Release: `https://github.com/CmdrFALCO/plm-change-impact-reference-case/releases/tag/v0.1.0`;
+- Zenodo DOI: `10.5281/zenodo.22235248`.
+
+The verified executable baseline remains:
 
 ```text
 7a5733fc7042e33a790db12278f8776d047eb4b6
 ```
 
-Later documentation and release-packaging commits do not move or redefine that verified
-implementation baseline.
+The published tag and later documentation/release-metadata commits do not move or redefine that
+verified implementation baseline.
 
 ## Recorded verification result
 
@@ -36,16 +43,28 @@ The six verification groups are:
 The six IT-16 families are execution baseline/overlay, candidate provenance, Assessment
 fulfilment, Assessment reuse, Decision support, and Decision Scope.
 
-## Later publication and packaging lineage
+## Publication and packaging lineage
 
-- Architecture publication merge:
+- verified executable baseline:
+  `7a5733fc7042e33a790db12278f8776d047eb4b6`;
+- architecture publication merge:
   `a1c3e1969dd75836b672f83684aa11feb4ee71df`;
 - Architecture Traceability and Assurance Pack merge:
   `5b0b9e7fb3e2fb4873e0daba125ffbd7c39b5b59`;
-- Current work: unreleased `0.1.0` reproducibility and repository-governance packaging.
+- Session 7 independent-review merge:
+  `8bc2aa211ac6a4524f857abf394d081e78664ded`;
+- `v0.1.0` release-preparation merge and tagged release commit:
+  `f15c75b237f85d0926ab0531962e4aba15568fab`;
+- Zenodo version DOI:
+  `10.5281/zenodo.22235248`.
 
-These commits package, explain, and reproduce the verified implementation. They do not add PLM
-functionality, change frozen scenarios or rules, or establish a new executable baseline.
+These commits and archival records package, explain, review and preserve the verified
+implementation. They do not add PLM functionality, change frozen scenarios or rules, or establish a
+new executable baseline.
+
+The Zenodo archive was created from the exact `v0.1.0` tag before post-release DOI metadata was
+written back to `main`. Post-release citation synchronization therefore does not alter the bytes of
+the published tag or archived source package.
 
 CI verifies the six frozen architecture files against
 [`docs/SHA256SUMS-frozen-architecture.txt`](docs/SHA256SUMS-frozen-architecture.txt).
