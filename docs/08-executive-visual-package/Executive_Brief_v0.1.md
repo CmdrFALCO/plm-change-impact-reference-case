@@ -71,7 +71,7 @@ The critical distinctions are:
 
 ### Why the prototype matters
 
-The executable demonstrator is not the main deliverable. It is the verification boundary for the architecture. The frozen scenarios run through the same application services used by the CLI and API, while independent expected oracles, integrity controls and historical reconstruction test whether the architecture is precise enough to execute without semantic shortcuts.
+The executable demonstrator is not the main deliverable. It is the verification boundary for the architecture. Delivery followed the frozen authority hierarchy through controlled implementation increments, acceptance gates and release-critical integrity tests. The scenarios run through the same application services used by the CLI and API, while independent expected oracles, historical reconstruction and deterministic evidence test whether the architecture is precise enough to execute without semantic shortcuts.
 
 Recorded verification at the executable baseline:
 
@@ -92,7 +92,7 @@ This project demonstrates deterministic conformance to a bounded synthetic refer
 - general arbitrary-graph impact discovery—the v0.1 impact adapter is deliberately fixture-bounded;
 - automated engineering judgement or automated terminal approval.
 
-The value of the case is the explicit, traceable chain from engineering problem to business architecture, information semantics, deterministic decisions, implementation controls, tests and evidence.
+The value of the case is the explicit, traceable chain from engineering problem to business architecture, information semantics, deterministic decision-readiness and routing logic, implementation controls, tests and evidence.
 
 ---
 
