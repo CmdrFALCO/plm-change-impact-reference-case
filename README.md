@@ -16,6 +16,8 @@ This repository shows how an engineering product-change problem can be transform
 - IT-16 cross-case injection families: **6/6 attempted, rejected and PASS**
 
 The verified implementation commit is intentionally identified separately from later documentation-only commits.
+See the [verified release baseline record](VERIFIED_BASELINE.md) for the executable result and
+later publication/packaging lineage.
 
 ## Start with the architecture
 
@@ -26,6 +28,9 @@ The architecture is the primary deliverable. The executable demonstrator is its 
 - **Deep technical review:** all six frozen artefacts in precedence order → scenario/impact fixtures → application and rule modules → `G00–G14` tests → committed evidence.
 
 The [Architecture Index](docs/00-architecture-index.md) records document status, precedence, SHA-256 values, public-safe boundaries and detailed reading paths.
+The [Architecture Traceability and Assurance Pack](docs/07-traceability-assurance/Architecture_Traceability_and_Assurance_Pack_v0.1.md)
+maps the frozen business requirements, invariants, rules, gates and integrity tests to implementation
+controls and committed evidence without redefining them.
 
 ## Why this reference case exists
 
@@ -150,6 +155,40 @@ The scenario diff files report PASS only when strict oracle comparison produces 
 
 Evidence generation is deterministic: the final verification was executed twice against the same implementation state and produced byte-identical files.
 
+## Reproducibility and release governance
+
+The canonical locked environment is Python 3.12 with [`requirements.lock`](requirements.lock).
+Install the locked runtime, development, test and build dependencies before installing the project
+without dependency resolution:
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install --require-hashes -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
+```
+
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`.
+
+The lock was generated with Python 3.12, pip 25.3, and pip-tools 7.6.1. The
+`CUSTOM_COMPILE_COMMAND` value makes the generated header byte-reproducible:
+
+```bash
+python -m pip install "pip==25.3" "pip-tools==7.6.1"
+export CUSTOM_COMPILE_COMMAND='python -m piptools compile pyproject.toml --extra dev --all-build-deps --generate-hashes --allow-unsafe --index-url https://pypi.org/simple --output-file requirements.lock'
+python -m piptools compile pyproject.toml --extra dev --all-build-deps --generate-hashes --allow-unsafe --index-url https://pypi.org/simple --output-file requirements.lock
+```
+
+The [verification workflow](.github/workflows/verify.yml) uses the same locked environment, runs
+Alembic from an empty SQLite database, executes the full test suite, executes `plm-ref verify all`
+twice, checks committed evidence for changes, and verifies
+[`evidence/SHA256SUMS.txt`](evidence/SHA256SUMS.txt).
+
+Release metadata and policy are recorded in the [MIT License](LICENSE),
+[`CITATION.cff`](CITATION.cff), [changelog](CHANGELOG.md), and
+[verified baseline record](VERIFIED_BASELINE.md). The repository remains an unreleased `0.1.0`
+release candidate.
+
 ## Quick start
 
 Requirements: **Python 3.12+**.
@@ -158,7 +197,8 @@ Requirements: **Python 3.12+**.
 git clone https://github.com/CmdrFALCO/plm-change-impact-reference-case.git
 cd plm-change-impact-reference-case
 
-python -m pip install -e '.[dev]'
+python -m pip install --require-hashes -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
 
 pytest -q
 plm-ref verify all
@@ -216,6 +256,11 @@ plm-ref verify all
 │   └── views/            # bounded view boundary
 ├── tests/         # acceptance, integration and integrity tests G00-G14
 ├── alembic.ini
+├── requirements.lock
+├── VERIFIED_BASELINE.md
+├── CITATION.cff
+├── CHANGELOG.md
+├── LICENSE
 ├── pyproject.toml
 └── README.md
 ```

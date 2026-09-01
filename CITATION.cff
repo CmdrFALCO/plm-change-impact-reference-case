@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this reference case, please cite it using this metadata."
+title: "Product Change Impact Assessment & Decision Readiness"
+type: software
+authors:
+  - family-names: Leu
+    given-names: Cristian
+    orcid: "https://orcid.org/0009-0008-7363-9688"
+repository-code: "https://github.com/CmdrFALCO/plm-change-impact-reference-case"
+version: 0.1.0
+license: MIT
