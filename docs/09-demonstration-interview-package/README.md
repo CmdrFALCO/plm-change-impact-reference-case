@@ -2,7 +2,7 @@
 
 ## Session 6 — Demonstration & Interview Package
 
-**Status:** Milestones 1–3 complete — five-minute deterministic demo, static evidence extracts, 15-minute architecture/interview walkthrough and 30-minute technical-review walkthrough  
+**Status:** Session 6 complete — five-minute deterministic demo, static evidence extracts, 15-minute architecture/interview walkthrough, 30-minute technical-review walkthrough, 60-second explanation and 3-minute explanation  
 **Release target:** `v0.1.0`  
 **Authority:** Derived communication material only; subordinate to the frozen architecture, code, tests and committed evidence
 
@@ -68,6 +68,12 @@ The 15-minute standard path is static-first. Live execution remains available th
 
 The 30-minute path distinguishes architecture decisions from implementation choices throughout. It uses repository inspection and committed static evidence by default; live execution is optional and must return immediately to the architectural statement being proved.
 
+### Milestone 4 — verbal explanations
+
+- [`Verbal_Explanations_v0.1.md`](Verbal_Explanations_v0.1.md) — one approximately 60-second and one approximately 3-minute role-neutral explanation, plus compression/expansion guidance and stable claim language.
+
+Both verbal versions compress the same canonical narrative. They are not alternative stories and must retain the same public-safe limitations as the longer walkthroughs.
+
 ## Evidence-extract rule
 
 The files under `evidence-extracts/` are **static communication views** of already committed evidence. They are not new scenario oracles, business objects or verification results.
@@ -86,11 +92,18 @@ evidence/verification_summary.md
 VERIFIED_BASELINE.md
 ```
 
-## Remaining Session 6 material
+## Session 6 completion rule
 
-Derive next from the same canonical presentation and accepted evidence set:
+The same architecture-first story is now available at four depths:
 
-1. 60-second verbal explanation;
-2. 3-minute verbal explanation.
+```text
+~60 seconds
+→ ~3 minutes
+→ 5-minute deterministic demo
+→ 15-minute architecture/interview walkthrough
+→ 30-minute technical review
+```
 
-No second canonical deck is required. The Session 5 presentation remains canonical; Session 6 progressively reveals additional evidence depth around it.
+The Session 5 ten-slide presentation remains canonical at every depth. Session 6 adds only scripts, static evidence views and controlled review paths; it does not create a competing deck or source of truth.
+
+Do not begin Session 7 independent review or Session 8 release/archive work from this package until the Session 6 branch has passed the repository verification workflow and been accepted through the protected pull-request path.
