@@ -2,7 +2,7 @@
 
 ## Session 6 — Demonstration & Interview Package
 
-**Status:** Milestones 1–2 complete — five-minute deterministic demo, static evidence extracts and 15-minute architecture/interview walkthrough  
+**Status:** Milestones 1–3 complete — five-minute deterministic demo, static evidence extracts, 15-minute architecture/interview walkthrough and 30-minute technical-review walkthrough  
 **Release target:** `v0.1.0`  
 **Authority:** Derived communication material only; subordinate to the frozen architecture, code, tests and committed evidence
 
@@ -62,6 +62,12 @@ Do not use this package to add PLM functionality, change Scenario A–C outcomes
 
 The 15-minute standard path is static-first. Live execution remains available through the separate five-minute demo when explicitly useful. This prevents the implementation interface from displacing the architecture narrative.
 
+### Milestone 3 — 30-minute technical-review walkthrough
+
+- [`Thirty_Minute_Technical_Review_v0.1.md`](Thirty_Minute_Technical_Review_v0.1.md) — same architecture-first spine expanded with baseline/overlay enforcement, case-local lineage, bounded impact-analysis boundary, `RRR-v0.1` mechanics, Scenario B reuse/immutability, Decision persistence, historical reconstruction, integrity tests and bounded findings.
+
+The 30-minute path distinguishes architecture decisions from implementation choices throughout. It uses repository inspection and committed static evidence by default; live execution is optional and must return immediately to the architectural statement being proved.
+
 ## Evidence-extract rule
 
 The files under `evidence-extracts/` are **static communication views** of already committed evidence. They are not new scenario oracles, business objects or verification results.
@@ -84,8 +90,7 @@ VERIFIED_BASELINE.md
 
 Derive next from the same canonical presentation and accepted evidence set:
 
-1. 30-minute technical-review walkthrough;
-2. 60-second verbal explanation;
-3. 3-minute verbal explanation.
+1. 60-second verbal explanation;
+2. 3-minute verbal explanation.
 
 No second canonical deck is required. The Session 5 presentation remains canonical; Session 6 progressively reveals additional evidence depth around it.
