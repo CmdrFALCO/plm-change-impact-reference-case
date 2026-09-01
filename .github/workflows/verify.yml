@@ -1,0 +1,54 @@
+name: Verify
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.lock
+
+      - name: Install locked environment
+        run: |
+          python -m pip install --require-hashes -r requirements.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+
+      - name: Upgrade empty SQLite schema
+        run: alembic upgrade head
+
+      - name: Verify frozen architecture hashes
+        run: sha256sum --check docs/SHA256SUMS-frozen-architecture.txt
+
+      - name: Run full regression suite
+        run: pytest -q
+
+      - name: Run first verification and check evidence hashes
+        run: |
+          plm-ref verify all
+          sha256sum --check evidence/SHA256SUMS.txt
+
+      - name: Run second verification and check evidence hashes
+        run: |
+          plm-ref verify all
+          sha256sum --check evidence/SHA256SUMS.txt
+
+      - name: Prove committed evidence is unchanged
+        run: git diff --exit-code -- evidence
