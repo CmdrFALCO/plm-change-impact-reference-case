@@ -2,17 +2,18 @@
 
 ## Release Manifest v0.1.0
 
-**Status:** Pre-release manifest  
-**Release target:** `v0.1.0`  
-**Release-preparation branch:** `release/v0.1.0`  
-**Release-preparation base:** `8bc2aa211ac6a4524f857abf394d081e78664ded`  
-**Verified executable baseline:** `7a5733fc7042e33a790db12278f8776d047eb4b6`
+**Status:** Published release manifest  
+**Release:** `v0.1.0`  
+**Release date:** `2026-09-01`  
+**Release commit:** `f15c75b237f85d0926ab0531962e4aba15568fab`  
+**Verified executable baseline:** `7a5733fc7042e33a790db12278f8776d047eb4b6`  
+**Zenodo DOI:** `10.5281/zenodo.22235248`
 
 ---
 
 ## 1. Purpose
 
-This manifest fixes the intended `v0.1.0` publication boundary without changing frozen architecture or executable semantics.
+This manifest records the published `v0.1.0` boundary without changing frozen architecture or executable semantics.
 
 It is release metadata only. If any statement here conflicts with a frozen artefact, the frozen authority chain wins.
 
@@ -31,16 +32,20 @@ reviewed main before release preparation
         ↓
 release/v0.1.0
         ↓
-protected release-preparation PR
+protected release-preparation PR #8
+        ↓
+release commit
+f15c75b237f85d0926ab0531962e4aba15568fab
         ↓
 annotated tag v0.1.0
         ↓
-GitHub Release
+GitHub Release — 2026-09-01
         ↓
-optional Zenodo archival record / DOI
+Zenodo archival record
+10.5281/zenodo.22235248
 ```
 
-No executable source, migration, scenario input, impact fixture, expected oracle, test or evidence-generation change is planned between the verified executable baseline and the release tag.
+No executable source, migration, scenario input, impact fixture, expected oracle, test or evidence-generation change occurred between the verified executable baseline and the release tag.
 
 ---
 
@@ -50,13 +55,13 @@ The six frozen artefacts are governed by:
 
 `docs/SHA256SUMS-frozen-architecture.txt`
 
-The release workflow must continue to pass:
+The protected release workflow passed:
 
 ```bash
 sha256sum --check docs/SHA256SUMS-frozen-architecture.txt
 ```
 
-A frozen-artefact hash change is not a release-packaging correction and requires the frozen change-control rule.
+A frozen-artefact hash change is not a release-packaging correction and remains subject to the frozen change-control rule.
 
 ---
 
@@ -81,13 +86,13 @@ evidence/verification_summary.md
 evidence/SHA256SUMS.txt
 ```
 
-The protected verification workflow must regenerate and check this evidence without leaving a committed diff.
+The protected verification workflow regenerated and checked this evidence twice without leaving a committed diff before the release tag was created.
 
 ---
 
 ## 5. Publication package
 
-The intended source release contains the following public layers:
+The published source release contains the following public layers:
 
 | Layer | Primary location | Release role |
 |---|---|---|
@@ -105,9 +110,9 @@ The intended source release contains the following public layers:
 
 ---
 
-## 6. Verification status required before tag
+## 6. Pre-tag verification status
 
-The release tag must not be created until the release-preparation PR and final `main` state satisfy all of the following:
+The release tag was created only after the release-preparation PR and final `main` state satisfied:
 
 ```text
 frozen architecture hashes        PASS
@@ -120,29 +125,49 @@ committed evidence unchanged      PASS
 required protected verify status  PASS
 ```
 
-The recorded executable baseline remains separately identified even when the release tag points to a later documentation/release commit.
+The recorded executable baseline remains separately identified even though the release tag points to a later documentation/release commit.
 
 ---
 
-## 7. Release-state fields
-
-These fields are deliberately left unresolved until the corresponding fact exists:
+## 7. Published release-state fields
 
 ```text
-annotated tag:        PENDING
-GitHub release:       PENDING
-release date:         PENDING ACTUAL PUBLICATION
-Zenodo archive:       PENDING DECISION / PUBLICATION
-Zenodo DOI:           PENDING
-citation DOI field:   PENDING
-maintenance mode:     PENDING FINAL CLOSE-OUT
+annotated tag:        v0.1.0
+release commit:       f15c75b237f85d0926ab0531962e4aba15568fab
+GitHub release:       PUBLISHED
+release date:         2026-09-01
+Zenodo archive:       PUBLISHED
+Zenodo DOI:           10.5281/zenodo.22235248
+citation DOI field:   RECORDED POST-RELEASE ON MAIN
+maintenance mode:     PENDING FINAL CAREER/PORTFOLIO CLOSE-OUT
 ```
 
-Do not replace these values with planned or guessed publication facts.
+GitHub Release:
+
+`https://github.com/CmdrFALCO/plm-change-impact-reference-case/releases/tag/v0.1.0`
+
+Zenodo DOI:
+
+`https://doi.org/10.5281/zenodo.22235248`
 
 ---
 
-## 8. Claim boundary
+## 8. Zenodo archival provenance
+
+The Zenodo source archive was generated from the exact published tag using `git archive`:
+
+```text
+archive file: plm-change-impact-reference-case-v0.1.0.zip
+source tag:   v0.1.0
+source commit:f15c75b237f85d0926ab0531962e4aba15568fab
+SHA-256:      ED7FC58122F86B9E230A185CECB6DD167E8FEED74713F04001FD1F1E3F57AFCB
+```
+
+The DOI and release date were intentionally not embedded by modifying the already-published tag. They are synchronized into post-release repository metadata on `main`, preserving the archived source as an exact representation of `v0.1.0`.
+
+---
+
+## 9. Claim boundary
 
 The release establishes deterministic conformance to the bounded synthetic reference case only.
 
