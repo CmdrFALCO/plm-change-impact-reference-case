@@ -6,18 +6,20 @@ This repository shows how an engineering product-change problem can be transform
 
 ## Status
 
-**Implementation complete — G00 to G14 PASS (15/15 acceptance gates).**
+**Release `v0.1.0` published and archived — 2026-09-01.**
 
+- GitHub Release: [Product Change Impact Assessment & Decision Readiness v0.1.0](https://github.com/CmdrFALCO/plm-change-impact-reference-case/releases/tag/v0.1.0)
+- Zenodo DOI: [10.5281/zenodo.22235248](https://doi.org/10.5281/zenodo.22235248)
 - Verified implementation baseline: `7a5733fc7042e33a790db12278f8776d047eb4b6`
+- Release commit/tag target: `f15c75b237f85d0926ab0531962e4aba15568fab`
 - Full regression at the verified baseline: **185 passed**
 - `plm-ref verify all`: **PASS / exit 0**
 - Repeated verification: **byte-identical evidence output**
 - Final verification groups: **6/6 PASS**
 - IT-16 cross-case injection families: **6/6 attempted, rejected and PASS**
 
-The verified implementation commit is intentionally identified separately from later documentation-only commits.
-See the [verified release baseline record](VERIFIED_BASELINE.md) for the executable result and
-later publication/packaging lineage.
+The verified implementation commit is intentionally identified separately from later documentation-only commits and from the published release tag.
+See the [verified release baseline record](VERIFIED_BASELINE.md) for the executable result and publication/packaging lineage.
 
 ## Start with the architecture
 
@@ -34,6 +36,7 @@ controls and committed evidence without redefining them.
 The [Executive Brief](docs/08-executive-visual-package/Executive_Brief_v0.1.md) provides a concise
 architecture-first entry point to the final visual package.
 The [Demonstration & Interview Package](docs/09-demonstration-interview-package/README.md) reuses that canonical package at approximately 60-second, 3-minute, 5-minute demo, 15-minute architecture/interview and 30-minute technical-review depth without creating a second narrative.
+The [v0.1.0 Release Package](docs/11-release/README.md) records the published GitHub/Zenodo identifiers, release lineage and archival provenance.
 
 ## Why this reference case exists
 
@@ -189,8 +192,7 @@ twice, checks committed evidence for changes, and verifies
 
 Release metadata and policy are recorded in the [MIT License](LICENSE),
 [`CITATION.cff`](CITATION.cff), [changelog](CHANGELOG.md), and
-[verified baseline record](VERIFIED_BASELINE.md). The repository remains an unreleased `0.1.0`
-release candidate.
+[verified baseline record](VERIFIED_BASELINE.md). Published release `v0.1.0` is archived on Zenodo under DOI `10.5281/zenodo.22235248`.
 
 ## Quick start
 
@@ -246,7 +248,7 @@ plm-ref verify all
 
 ```text
 .
-├── docs/          # frozen architecture authority chain and publication/review packages
+├── docs/          # frozen architecture authority chain and publication/review/release packages
 ├── data/          # frozen source, baseline, impact and expected scenario fixtures
 ├── evidence/      # deterministic verification evidence
 ├── migrations/    # Alembic schema and integrity migrations
