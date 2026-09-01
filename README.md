@@ -33,6 +33,7 @@ maps the frozen business requirements, invariants, rules, gates and integrity te
 controls and committed evidence without redefining them.
 The [Executive Brief](docs/08-executive-visual-package/Executive_Brief_v0.1.md) provides a concise
 architecture-first entry point to the final visual package.
+The [Demonstration & Interview Package](docs/09-demonstration-interview-package/README.md) reuses that canonical package at approximately 60-second, 3-minute, 5-minute demo, 15-minute architecture/interview and 30-minute technical-review depth without creating a second narrative.
 
 ## Why this reference case exists
 
@@ -181,7 +182,7 @@ export CUSTOM_COMPILE_COMMAND='python -m piptools compile pyproject.toml --extra
 python -m piptools compile pyproject.toml --extra dev --all-build-deps --generate-hashes --allow-unsafe --index-url https://pypi.org/simple --output-file requirements.lock
 ```
 
-The [verification workflow](.github/workflows/verify.yml) uses the same locked environment, runs
+The [verification workflow](.github/workflows/verify.yml) uses the same locked Python 3.12 environment on the pinned Ubuntu 24.04 runner, runs
 Alembic from an empty SQLite database, executes the full test suite, executes `plm-ref verify all`
 twice, checks committed evidence for changes, and verifies
 [`evidence/SHA256SUMS.txt`](evidence/SHA256SUMS.txt).
@@ -193,7 +194,7 @@ release candidate.
 
 ## Quick start
 
-Requirements: **Python 3.12+**.
+**Verified release environment: Python 3.12.** Project metadata permits Python 3.12+, but the locked dependency set and release CI reproducibility claim are established on Python 3.12.
 
 ```bash
 git clone https://github.com/CmdrFALCO/plm-change-impact-reference-case.git
@@ -245,7 +246,7 @@ plm-ref verify all
 
 ```text
 .
-├── docs/          # frozen architecture authority chain and publication index
+├── docs/          # frozen architecture authority chain and publication/review packages
 ├── data/          # frozen source, baseline, impact and expected scenario fixtures
 ├── evidence/      # deterministic verification evidence
 ├── migrations/    # Alembic schema and integrity migrations
@@ -271,7 +272,7 @@ plm-ref verify all
 
 The demonstrator is intentionally small and local:
 
-- Python 3.12+
+- Python 3.12+ project runtime range; release verification is pinned to Python 3.12
 - FastAPI
 - Pydantic v2
 - SQLAlchemy 2.x
