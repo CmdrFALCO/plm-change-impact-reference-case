@@ -2,17 +2,19 @@
 
 ## v0.1.0 Release Package
 
-**Status:** Release preparation in progress  
-**Release target:** `v0.1.0`
+**Status:** Published and archived  
+**Release:** `v0.1.0`  
+**Release date:** `2026-09-01`  
+**Zenodo DOI:** `10.5281/zenodo.22235248`
 
 This directory contains release-layer metadata only. It does not redefine frozen architecture, scenario semantics or the verified executable baseline.
 
-## Prepared material
+## Published material
 
-- [`Release_Notes_v0.1.0.md`](Release_Notes_v0.1.0.md) — prepared GitHub Release narrative, verification summary, package navigation and claim boundary.
-- [`Release_Manifest_v0.1.0.md`](Release_Manifest_v0.1.0.md) — release lineage, source/evidence integrity references and pre-tag acceptance conditions.
+- [`Release_Notes_v0.1.0.md`](Release_Notes_v0.1.0.md) — final release narrative, verification summary, package navigation, claim boundary and archival status.
+- [`Release_Manifest_v0.1.0.md`](Release_Manifest_v0.1.0.md) — release lineage, source/evidence integrity references, tag/commit identity and Zenodo archival provenance.
 
-## Release sequencing
+## Completed release sequence
 
 ```text
 prepare release notes / manifest
@@ -20,13 +22,21 @@ prepare release notes / manifest
 → verify final main
 → create annotated v0.1.0 tag
 → publish GitHub Release
-→ update actual release date / citation metadata
-→ publish Zenodo archive if selected
-→ update career / portfolio links
-→ maintenance mode
+→ publish Zenodo archive
+→ synchronize actual release date / DOI metadata back to main
 ```
 
-The final release date and any DOI remain unset until those publication facts actually exist.
+Remaining close-out work is limited to career/portfolio integration and maintenance-mode housekeeping. It is not permission to add PLM scope or change frozen semantics.
+
+## Published identifiers
+
+```text
+release tag:          v0.1.0
+release commit:       f15c75b237f85d0926ab0531962e4aba15568fab
+release date:         2026-09-01
+GitHub Release:       https://github.com/CmdrFALCO/plm-change-impact-reference-case/releases/tag/v0.1.0
+Zenodo DOI:           10.5281/zenodo.22235248
+```
 
 ## Governing boundary
 
@@ -36,4 +46,4 @@ The verified executable baseline remains:
 7a5733fc7042e33a790db12278f8776d047eb4b6
 ```
 
-Documentation and release packaging do not move that executable baseline.
+Publication, DOI synchronization and release packaging do not move that executable baseline or alter the published `v0.1.0` tag.
