@@ -17,7 +17,7 @@ Revision A → Revision B
 
 That pair records succession, but not the basis on which a decision can be made. It does not identify the exact authoritative state evaluated, the configuration and usage context, the proposed scope, newly discovered impacts, required domain assessments, evidence used at assessment time, unresolved blockers, decision authority or the exact scope ultimately authorised or rejected.
 
-When these concepts are collapsed, several unsafe equivalences appear:
+When these concepts are collapsed, several false equivalences appear:
 
 - discovered impact becomes assumed authorised scope;
 - Evidence is treated as if it established Requirement compliance;
@@ -38,23 +38,25 @@ Impact-analysis Execution
         ↓
 Impact Candidates with structured provenance
         ↓
-Assessment Obligations, Assessments and Evidence Uses
-        ↓
-Gate B: Decision Package Complete
-        ↓
-Authorisation Eligibility
-        ↓
-Required vs Current Authority
-        ↓
-terminal Decision Record OR non-terminal Process-history route
-        ↓
-derived Handover View for an authorised Decision
+Assessment Obligations, Assessments and Assessment Evidence Uses
+        ├─ Scope Revision Required → explicit scope amendment and new proposal cycle
+        └─ no scope route
+                    ↓
+        Gate B: Decision Package Complete
+                    ↓
+        Authorisation Eligibility
+                    ↓
+        Required vs Current Authority
+        ├─ insufficient → Escalated Process-history Entry
+        └─ sufficient + explicit authority disposition → terminal Decision Record
+                                                        ↓
+                                           derived Handover View
 ```
 
 The critical distinctions are:
 
 - **Assessment Baseline vs Overlay Revision:** authoritative current-state snapshots remain immutable while the proposed state stays non-authoritative and versioned.
-- **Impact Candidate vs proposed or Decision Scope:** discovery identifies what may be affected; it never authorises a change automatically.
+- **Impact Candidate vs Proposed Change Scope or Decision Scope:** discovery identifies what may be affected; it never authorises a change automatically.
 - **Evidence Record vs Requirement Conclusion:** Evidence informs an Assessment; only the Assessment records the engineering conclusion.
 - **Gate B vs Authorisation Eligibility vs authority sufficiency:** a complete package may still be substantively blocked or require a higher authority level.
 - **Process-history Entry vs Decision Record:** return, scope revision and escalation keep the case open; only an explicit terminal authority disposition creates a Decision Record.
