@@ -50,11 +50,14 @@ Do not use this package to add PLM functionality, change Scenario A–C outcomes
 ### Milestone 1 — five-minute deterministic demo and evidence views
 
 - [`Five_Minute_Deterministic_Demo_v0.1.md`](Five_Minute_Deterministic_Demo_v0.1.md) — exact architecture-first five-minute live/static path.
+- [`Demo_Command_Reference_v0.1.md`](Demo_Command_Reference_v0.1.md) — operator-only Bash and Windows PowerShell commands for the same five-minute demo; it adds no narrative or architecture meaning.
 - [`evidence-extracts/01_scenario_a_terminal_basis.md`](evidence-extracts/01_scenario_a_terminal_basis.md) — authorised terminal Decision basis.
 - [`evidence-extracts/02_scenario_b_scope_amendment.md`](evidence-extracts/02_scenario_b_scope_amendment.md) — explicit scope-revision loop and baseline reuse.
 - [`evidence-extracts/03_scenario_b_reuse_and_readiness.md`](evidence-extracts/03_scenario_b_reuse_and_readiness.md) — execution-relative Assessment reuse and remaining obligations.
 - [`evidence-extracts/04_scenario_c_authority_escalation.md`](evidence-extracts/04_scenario_c_authority_escalation.md) — complete package with insufficient authority and no Decision.
 - [`evidence-extracts/05_verification_evidence.md`](evidence-extracts/05_verification_evidence.md) — verification groups, regression boundary and IT-16 injection results.
+
+The narrative script remains platform-neutral. Operators should use the command reference matching the presentation host rather than translating shell syntax during a live interview.
 
 ### Milestone 2 — 15-minute architecture/interview walkthrough
 
@@ -106,4 +109,4 @@ The same architecture-first story is now available at five depths:
 
 The Session 5 ten-slide presentation remains canonical at every depth. Session 6 adds only scripts, static evidence views and controlled review paths; it does not create a competing deck or source of truth.
 
-Session 6 was accepted through protected PR #5 and passed the required verification workflow before merge and again on the post-merge `main` run. The next planned phase is Session 7 — independent review and correction. Session 8 release/archive work remains deferred until Session 7 is complete.
+Session 6 was accepted through protected PR #5 and passed the required verification workflow before merge and again on the post-merge `main` run. Session 7 may add downstream corrections such as command portability without changing the accepted narrative or frozen architecture. Session 8 release/archive work remains deferred until Session 7 is complete.
