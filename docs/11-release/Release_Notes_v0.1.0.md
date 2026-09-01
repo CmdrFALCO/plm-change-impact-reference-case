@@ -1,8 +1,10 @@
 # Product Change Impact Assessment & Decision Readiness — v0.1.0
 
-**Status:** Prepared release notes — `v0.1.0` is not released until the final tag and GitHub Release exist  
-**Release-preparation base:** `8bc2aa211ac6a4524f857abf394d081e78664ded`  
+**Status:** Published  
+**Release date:** `2026-09-01`  
+**Release tag:** `v0.1.0` → `f15c75b237f85d0926ab0531962e4aba15568fab`  
 **Verified executable baseline:** `7a5733fc7042e33a790db12278f8776d047eb4b6`  
+**Zenodo DOI:** `10.5281/zenodo.22235248`  
 **Licence:** MIT
 
 ---
@@ -243,13 +245,15 @@ Recommended entry points:
 
 ## Citation and archival status
 
-The repository already contains `CITATION.cff` with title, author, ORCID, repository, version and licence metadata.
+Published release facts:
 
-At release-note preparation time:
+- GitHub release date: **2026-09-01**;
+- annotated tag: **`v0.1.0`**;
+- release commit: **`f15c75b237f85d0926ab0531962e4aba15568fab`**;
+- GitHub Release: `https://github.com/CmdrFALCO/plm-change-impact-reference-case/releases/tag/v0.1.0`;
+- Zenodo archive: **published**;
+- Zenodo version DOI: **`10.5281/zenodo.22235248`**;
+- archived source file: `plm-change-impact-reference-case-v0.1.0.zip`;
+- local SHA-256 of the archived tagged source: `ED7FC58122F86B9E230A185CECB6DD167E8FEED74713F04001FD1F1E3F57AFCB`.
 
-- final GitHub release date: **pending actual publication**;
-- annotated tag `v0.1.0`: **pending**;
-- GitHub Release: **pending**;
-- Zenodo archival record / DOI: **pending selection and publication**.
-
-Release date and DOI must not be invented in advance. They are added only when the corresponding publication facts exist.
+The Zenodo source archive was generated directly from the exact `v0.1.0` annotated tag. DOI/date synchronization back to `main` is post-release metadata and does not modify the published tag or archived source bytes.
